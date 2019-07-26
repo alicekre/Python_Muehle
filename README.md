@@ -1,3 +1,3 @@
 # Python_Muehle
 
-#Abschlussprojekt Spiellogik und grafische Oberfläche
+#Abschlussprojekt Spiellogik und graphische Oberfläche
