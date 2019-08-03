@@ -14,6 +14,7 @@ from PyQt5.QtCore import QMimeData, Qt
 
 from mylabel import MyLabel
 
+Ui_MainWindow, WindowBaseClass = uic.loadUiType("Spielfeld_OF_3.ui")
 
 class MyDialog(WindowBaseClass, Ui_MainWindow):
     def __init__(self, parent=None):
