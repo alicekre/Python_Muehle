@@ -6,11 +6,11 @@ from PyQt5.QtWidgets import QLabel, QApplication
 
 
 class playing_field_label(QLabel):
-    def __init__(self,title):
+    def __init__(self, title):
         super().__init__(title)
         self.setAcceptDrops(True)
 
-    def dragEnterEvent(self,event):
+    def dragEnterEvent(self, event):
         if event.mimeData().hasImage():
             print("event accepted")
             event.accept()
@@ -18,7 +18,7 @@ class playing_field_label(QLabel):
             print("event rejected")
             event.ignore()
 
-    def dropEvent(self,event):
+    def dropEvent(self, event):
         if event.mimeData().hasImage():
             print("dropEvent")
             print(self.pos())

@@ -4,9 +4,10 @@ from PyQt5.QtWidgets import QLabel, QApplication
 
 
 class token_label(QLabel):
-    def __init__(self,parent):
-        super(QLabel,self).__init__(parent)
+    def __init__(self, parent):
+        super(QLabel, self).__init__(parent)
         self.show()
+
     def mousePressEvent(self, event):
         print("Pressed")
         if event.button() == Qt.LeftButton:

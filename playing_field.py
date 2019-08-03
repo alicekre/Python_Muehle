@@ -15,34 +15,34 @@ from positions import Positions
 from token_label import token_label
 
 Ui_MainWindow, WindowBaseClass = uic.loadUiType("Spielfeld_OF_4.ui")
-        
+
+
 class MyDialog(WindowBaseClass, Ui_MainWindow):
     def __init__(self, parent=None):
         WindowBaseClass.__init__(self)
-        Ui_MainWindow.__init__(self) 
+        Ui_MainWindow.__init__(self)
         self.setupUi(self)
         self.resize(1200, 900)
         self.update()
         self.initMe()
-#        self.token_label().setImage('blau.svg')
-        #self.label_111.setImage('gelb.svg') 
-    
+
+    #        self.token_label().setImage('blau.svg')
+    # self.label_111.setImage('gelb.svg')
+
     def initMe(self):
-        edit = token_label("Hello") #QLabel("gelb_1", self)
+        edit = token_label("Hello")  # QLabel("gelb_1", self)
         playing_field_corner = playing_field_label("Hello")
 
-        edit.move(100,100)
+        edit.move(100, 100)
         btn = Positions("0")
-    #def removeToken(self, label):
-     #   label.clear()
-      #  label.setText("o")
-        #self.label_111.remove('gelb.svg')
-        
-        
-        
-        
-if __name__ == "__main__":    
-        
+    # def removeToken(self, label):
+    #   label.clear()
+    #  label.setText("o")
+    # self.label_111.remove('gelb.svg')
+
+
+if __name__ == "__main__":
+
     # In Spyder kann nur eine Qt-Applikation laufen und sie werden nicht anschliessend geloescht
     if QtCore.QCoreApplication.instance() is not None:
         app = QtCore.QCoreApplication.instance()
