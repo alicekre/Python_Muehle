@@ -1,14 +1,13 @@
 #
 #
 #
-# Board game mill
+# Logic of board game mill
 #
 
-from ast import literal_eval as make_tuple
 from prettytable import PrettyTable  # just used for printing the play board formatted.
 
 
-class Field:
+class _Field:
     """
     This class represents the play board as undirected graph.
 
@@ -18,37 +17,48 @@ class Field:
     State = 0: no chip, state = 1: chip of player_1, state = 2: chip of player_2.
 
     Attributes:
-        field (dictionary): The graph (play board).
-
+        __field (dictionary): The graph (play board).
     """
 
     def __init__(self):
-        """The constructor for Field class"""
-        self.field = {(1, 1, 1): [frozenset({(1, 2, 1), (1, 1, 2)}), 0],
-                      (1, 1, 2): [frozenset({(1, 1, 1), (1, 1, 3), (2, 1, 2)}), 0],
-                      (1, 1, 3): [frozenset({(1, 1, 2), (1, 2, 3)}), 0],
-                      (1, 2, 1): [frozenset({(1, 1, 1), (1, 3, 1), (2, 2, 1)}), 0],
-                      (1, 2, 3): [frozenset({(1, 1, 3), (1, 3, 3), (2, 2, 3)}), 0],
-                      (1, 3, 1): [frozenset({(1, 2, 1), (1, 3, 2)}), 0],
-                      (1, 3, 2): [frozenset({(1, 3, 1), (1, 3, 3), (2, 3, 2)}), 0],
-                      (1, 3, 3): [frozenset({(1, 3, 2), (1, 2, 3)}), 0],
-                      (2, 1, 1): [frozenset({(2, 1, 2), (2, 2, 1)}), 0],
-                      (2, 1, 2): [frozenset({(2, 1, 1), (2, 1, 3), (3, 1, 2), (1, 1, 2)}), 0],
-                      (2, 1, 3): [frozenset({(2, 1, 2), (2, 2, 3)}), 0],
-                      (2, 2, 1): [frozenset({(2, 1, 1), (2, 3, 1), (1, 2, 1), (3, 2, 1)}), 0],
-                      (2, 2, 3): [frozenset({(2, 1, 3), (2, 3, 3), (3, 2, 3), (1, 2, 3)}), 0],
-                      (2, 3, 1): [frozenset({(2, 2, 1), (2, 3, 2)}), 0],
-                      (2, 3, 2): [frozenset({(2, 3, 1), (2, 3, 3), (1, 3, 2), (3, 3, 2)}), 0],
-                      (2, 3, 3): [frozenset({(2, 3, 2), (2, 2, 3)}), 0],
-                      (3, 1, 1): [frozenset({(3, 1, 2), (3, 2, 1)}), 0],
-                      (3, 1, 2): [frozenset({(3, 1, 1), (3, 1, 3), (2, 1, 2)}), 0],
-                      (3, 1, 3): [frozenset({(3, 1, 2), (3, 2, 3)}), 0],
-                      (3, 2, 1): [frozenset({(3, 1, 1), (3, 3, 1), (2, 2, 1)}), 0],
-                      (3, 2, 3): [frozenset({(3, 1, 3), (3, 3, 3), (2, 2, 3)}), 0],
-                      (3, 3, 1): [frozenset({(3, 2, 1), (3, 3, 2)}), 0],
-                      (3, 3, 2): [frozenset({(3, 3, 1), (3, 3, 3), (2, 3, 2)}), 0],
-                      (3, 3, 3): [frozenset({(3, 3, 2), (3, 2, 3)}), 0]
-                      }
+        """The constructor for _Field class"""
+        self.__field = {(1, 1, 1): [frozenset({(1, 2, 1), (1, 1, 2)}), 0],
+                        (1, 1, 2): [frozenset({(1, 1, 1), (1, 1, 3), (2, 1, 2)}), 0],
+                        (1, 1, 3): [frozenset({(1, 1, 2), (1, 2, 3)}), 0],
+                        (1, 2, 1): [frozenset({(1, 1, 1), (1, 3, 1), (2, 2, 1)}), 0],
+                        (1, 2, 3): [frozenset({(1, 1, 3), (1, 3, 3), (2, 2, 3)}), 0],
+                        (1, 3, 1): [frozenset({(1, 2, 1), (1, 3, 2)}), 0],
+                        (1, 3, 2): [frozenset({(1, 3, 1), (1, 3, 3), (2, 3, 2)}), 0],
+                        (1, 3, 3): [frozenset({(1, 3, 2), (1, 2, 3)}), 0],
+                        (2, 1, 1): [frozenset({(2, 1, 2), (2, 2, 1)}), 0],
+                        (2, 1, 2): [frozenset({(2, 1, 1), (2, 1, 3), (3, 1, 2), (1, 1, 2)}), 0],
+                        (2, 1, 3): [frozenset({(2, 1, 2), (2, 2, 3)}), 0],
+                        (2, 2, 1): [frozenset({(2, 1, 1), (2, 3, 1), (1, 2, 1), (3, 2, 1)}), 0],
+                        (2, 2, 3): [frozenset({(2, 1, 3), (2, 3, 3), (3, 2, 3), (1, 2, 3)}), 0],
+                        (2, 3, 1): [frozenset({(2, 2, 1), (2, 3, 2)}), 0],
+                        (2, 3, 2): [frozenset({(2, 3, 1), (2, 3, 3), (1, 3, 2), (3, 3, 2)}), 0],
+                        (2, 3, 3): [frozenset({(2, 3, 2), (2, 2, 3)}), 0],
+                        (3, 1, 1): [frozenset({(3, 1, 2), (3, 2, 1)}), 0],
+                        (3, 1, 2): [frozenset({(3, 1, 1), (3, 1, 3), (2, 1, 2)}), 0],
+                        (3, 1, 3): [frozenset({(3, 1, 2), (3, 2, 3)}), 0],
+                        (3, 2, 1): [frozenset({(3, 1, 1), (3, 3, 1), (2, 2, 1)}), 0],
+                        (3, 2, 3): [frozenset({(3, 1, 3), (3, 3, 3), (2, 2, 3)}), 0],
+                        (3, 3, 1): [frozenset({(3, 2, 1), (3, 3, 2)}), 0],
+                        (3, 3, 2): [frozenset({(3, 3, 1), (3, 3, 3), (2, 3, 2)}), 0],
+                        (3, 3, 3): [frozenset({(3, 3, 2), (3, 2, 3)}), 0]
+                        }
+
+    def get_nodes(self):
+        """
+        returns all nodes of the graph as a set
+
+        :return: all nodes of graph
+        :rtype: set
+        """
+        nodes = set()
+        for node in self.__field:
+            nodes.add(node)
+        return nodes
 
     def get_edges(self, node):
         """
@@ -60,7 +70,7 @@ class Field:
         :rtype: frozenset
         """
 
-        return self.field[node][0]
+        return self.__field[node][0]
 
     def get_state(self, node):
         """
@@ -72,7 +82,7 @@ class Field:
         :rtype: int
         """
 
-        return self.field[node][1]
+        return self.__field[node][1]
 
     def set_node_state(self, node, state=0):
         """
@@ -89,7 +99,7 @@ class Field:
         if state not in (0, 1, 2):
             raise ValueError
 
-        self.field[node][1] = state
+        self.__field[node][1] = state
 
     def deg(self, node):
         """
@@ -183,7 +193,7 @@ class Field:
             raise ValueError
 
         nodes = set()
-        for node in self.field:
+        for node in self.__field:
             if self.get_state(node) == state:
                 nodes.add(node)
         return frozenset(nodes)
@@ -210,6 +220,18 @@ class Field:
             if self.get_state(edge) == state:
                 edges.add(edge)
         return frozenset(edges)
+
+    def get_states(self):
+        """
+        returns all nodes and their state as dictionary
+
+        :return: all nodes and their state
+        :rtype: dict
+        """
+        graph = {}
+        for node in self.__field:
+            graph[node] = self.get_state(node)
+        return graph
 
     def print_playboard(self):
         """prints the current graph formatted in a table (play board)"""
@@ -306,29 +328,37 @@ class Field:
         return False
 
 
-class Player:
-    # TODO implement names of players
+class _Player:
     """
     The class Player represents a player in the game
 
     Attributes:
         number_chips (int): the number of chips that the player has but not on the board
         phase (int): the phase in which the player is 1 = set chips, 2 = move on the play board, 3 = jumping
+        number (int):
     """
-    def __init__(self, number_chips=9, phase=1):
+
+    def __init__(self, number, number_chips=4, phase=1):
         """The constructor for Player class"""
+        if number not in (1, 2):
+            raise ValueError
+        self.number = number
         self.number_chips = number_chips
         self.phase = phase
 
     def put_chip(self):
-        """reduce number_chips if the player has chips"""
+        """
+        reduce number_chips if the player has chips
+
+        :raise: PlayerException if player has less than 1 chip
+        """
         if self.number_chips <= 0:
-            raise PlayerException
+            raise _PlayerException
         else:
             self.number_chips -= 1
 
 
-class PlayerException(Exception):
+class _PlayerException(Exception):
     """The class PlayerException is a Exception class for the class Player"""
     def __init__(self):
         """The constructor for the PlayerException class"""
@@ -337,114 +367,293 @@ class PlayerException(Exception):
 
 class Game:
     """
-    The class Game represents the board game mill
+    The Game class
 
     Attributes:
-        player_1 (Player): the first player
-        player_2 (Player): the second player
-        field (Field): the play board
-        turn (int): indicates which player is in turn (1, 2)
-        move_counter (int): counts the moves between to mills
-        history (list): list of class Field, Play board after every move
+        __player_1 (Player): The first player
+        __player_2 (Player): The second player
+        __field (Field): The play board
+        __turn (Player): The player who is in turn
+        __move_counter (int): counts the moves between two mills
+        __history (list): list of dict with nodes and states
+        __mill (bool): indicates if there is a mill and no chip was removed
     """
 
     def __init__(self):
         """The constructor for Game class"""
-        self.player_1 = Player()
-        self.player_2 = Player()
-        self.field = Field()
-        # turn = 1: turn of player_1, turn = 2: turn of player_2
-        self.turn = 1
-        self.move_counter = 0
-        self.history = [self.field]
+        self.__player_1 = _Player(1)
+        self.__player_2 = _Player(2)
+        self.__field = _Field()
+        self.__turn = self.__player_1
+        self.__move_counter = 0
+        self.__history = []
+        self.__mill = False
 
     def __change_turn(self):
         """
-        changes the turn
+        changes turn between the two players
 
-        Changes turn into 2 if turn=1. Changes turn into 1 if turn=2.
-
-        :raise: ValueError if turn is not 1 or 2
+        :raise: ValueError if turn is not player_1 or player_2
         """
 
-        if self.turn == 1:
-            self.turn = 2
-        elif self.turn == 2:
-            self.turn = 1
+        if self.__turn is self.__player_1:
+            self.__turn = self.__player_2
+            print("Changed player in turn to player 2")
+        elif self.__turn is self.__player_2:
+            self.__turn = self.__player_1
+            print("Changed player in turn to player 1")
         else:
             raise ValueError
 
-    def __get_number_of_opponent(self):
+    def __get_opponent(self):
         """
-        returns the number of the player who is not in turn
+        returns the player who is not in turn
 
-        :return: number of the player who is not in turn (1, 2)
+        :return: the player who is not in turn
+        :rtype: _Player
+        :raise: ValueError if Player is not player_1 or player_2
+        """
+
+        if self.__turn is self.__player_1:
+            return self.__player_2
+        elif self.__turn is self.__player_2:
+            return self.__player_1
+        else:
+            raise ValueError
+
+    def __check_history(self):
+        """
+        returns True if current field is not more than 2 times in history
+
+        :return: True if current field is not more than 2 times in history
+        :rtype: bool
+        """
+
+        duplicates = {}
+        for field in self.__history:
+            # dict is unhashable so do workaround
+            hashable = frozenset(field.items())
+            if hashable in duplicates:
+                duplicates[hashable] += 1
+                if duplicates[hashable] >= 3:
+                    return False
+            else:
+                duplicates[hashable] = 1
+        return True
+
+    def __change_to_phase_2(self):
+        """changes phase of player to 2 if player have no chips"""
+        player = self.__turn
+        if player.number_chips == 0:
+            player.phase = 2
+            print("Changed Player {} into move phase".format(player.number))
+
+    def __change_to_phase_3(self):
+        """changes phase of player to 3 if player have less than 3 chips on the play board"""
+        opponent = self.__get_opponent()
+        if len(self.__field.get_nodes_by_state(opponent.number)) < 4 and opponent.number_chips == 0:
+            opponent.phase = 3
+            print("Changed Player {} into jump phase".format(opponent.number))
+
+    def __check_phase_1(self, start_pos, end_pos):
+        """
+        checks if a move in phase 1 is valid
+
+        :param start_pos: current position of the chip
+        :type start_pos: tuple
+        :param end_pos: new position of the chip
+        :type end_pos:tuple
+        :raise: MoveException if move is invalid
+        """
+
+        if start_pos is not None:
+            raise MoveException("Player is in putting phase.")
+        if self.__field.get_state(end_pos) != 0:
+            raise MoveException("There is already a chip on this position.")
+        if self.__turn.number_chips < 1:
+            raise MoveException("Player has no chips to set.")
+
+    def __check_phase_2(self, start_pos, end_pos):
+        """
+        checks if a move in phase 2 is valid
+
+        :param start_pos: current position of the chip
+        :type start_pos: tuple
+        :param end_pos: new position of the chip
+        :type end_pos:tuple
+        :raise: MoveException if move is invalid
+        """
+
+        valid_start = self.__field.get_nodes_by_state(self.__turn.number)
+
+        if start_pos not in valid_start:
+            raise MoveException("Chip is not of Player {}.".format(self.__turn.number))
+
+        valid_end = self.__field.get_edges_by_state(start_pos, 0)
+        if end_pos not in valid_end:
+            raise MoveException("Chip can not be moved to this position.")
+
+    def __check_phase_3(self, start_pos, end_pos):
+        """
+        checks if a move in phase 3 is valid
+
+        :param start_pos: current position of the chip
+        :type start_pos: tuple
+        :param end_pos: new position of the chip
+        :type end_pos:tuple
+        :raise: MoveException if move is invalid
+        """
+
+        valid_start = self.__field.get_nodes_by_state(self.__turn.number)
+        valid_end = self.__field.get_nodes_by_state(0)
+        if start_pos not in valid_start:
+            raise MoveException("Chip is not of Player {}.".format(self.__turn.number))
+        if end_pos not in valid_end:
+            raise MoveException("Chip can not be moved to this position.")
+
+    def __phase_1(self, end_pos):
+        """
+        move in phase 1
+
+        :param end_pos: new position of the chip
+        :type end_pos:tuple
+        """
+
+        self.__field.set_node_state(end_pos, self.__turn.number)
+        self.__turn.put_chip()
+        print("Put chip of Player {} on position {}".format(self.__turn.number, end_pos))
+        if self.check_on_mill(end_pos):
+            self.__mill = True
+            # decrease move_counter because move_counter is increased in every move. The move after a mill is the first
+            # not second move.
+            self.__move_counter = -1
+        self.__change_to_phase_2()
+
+    def __phase_2(self, start_pos, end_pos):
+        """
+        move in phase 2
+
+        :param start_pos: current position of the chip
+        :type start_pos: tuple
+        :param end_pos: new position of the chip
+        :type end_pos: tuple
+        """
+
+        # update graph (play board)
+        self.__field.set_node_state(start_pos, 0)
+        self.__field.set_node_state(end_pos, self.__turn.number)
+
+        # check if the node on the new position is in a mill
+        if self.check_on_mill(end_pos):
+            self.__mill = True
+            # decrease move_counter because move_counter is increased in every move. The move after a mill is the first
+            # not second move.
+            self.__move_counter = -1
+
+    def __phase_3(self, start_pos, end_pos):
+        """
+        move in phase 3
+
+        :param start_pos: current position of the chip
+        :type start_pos: tuple
+        :param end_pos: new position of the chip
+        :type end_pos: tuple
+        """
+
+        # update graph (play board)
+        self.__field.set_node_state(start_pos, 0)
+        self.__field.set_node_state(end_pos, self.__turn.number)
+
+        # check if the node on the new position is in a mill
+        if self.check_on_mill(end_pos):
+            self.__mill = True
+
+    def __check_on_win_and_remis(self):
+        """
+        checks if player wins or the game end because remis
+
+        :raise: WinException if player wins
+        :raise: RemisException if game ends in remis
+        """
+
+        opponent = self.__get_opponent()
+        # the opponent looses if he has less than 3 chips on the play board
+        if len(self.__field.get_nodes_by_state(opponent.number)) < 3 and opponent.number_chips == 0:
+            raise WinException(self.__turn.number, self.__get_opponent().number)
+
+        # opponent looses if there is not any chip he can move
+        elif not self.__field.check_exist_edges_of_state(self.__turn.number, 0):
+            raise WinException(self.__turn.number, self.__get_opponent().number)
+
+        # check on remis
+        elif self.__move_counter >= 50:
+            raise RemisException(1)
+
+        elif not self.__check_history():
+            raise RemisException(2)
+
+    def __is_valid_move(self, start_pos, end_pos):
+        """
+        checks if move is valid
+
+        :param start_pos: current position of the chip
+        :type start_pos: tuple
+        :param end_pos: new position of the chip
+        :type end_pos: tuple
+        :raise: ValueError if position is not a valid node
+        """
+
+        nodes = self.__field.get_nodes()
+        if (start_pos not in nodes or start_pos is None) and end_pos not in nodes:
+            raise ValueError
+        if self.__turn.phase == 1:
+            self.__check_phase_1(start_pos, end_pos)
+        elif self.__turn.phase == 2:
+            self.__check_phase_2(start_pos, end_pos)
+        elif self.__turn.phase == 3:
+            self.__check_phase_3(start_pos, end_pos)
+        else:
+            raise ValueError
+
+    def get_turn(self):
+        """
+        returns the the number of the player who is in turn
+
+        :return: the number of the player who is in turn
         :rtype: int
-        :raise: ValueError if turn is not 1 or 2
         """
 
-        if self.turn == 1:
-            return 2
-        elif self.turn == 2:
-            return 1
-        else:
-            raise ValueError
+        return self.__turn.number
 
-    def __get_player_by_number(self, number):
+    def get_field(self):
         """
-        returns the player by number
+        returns the nodes and states
 
-        Returns player_1 if number=1. Returns player_2 if number=2.
-
-        :param number: the number of the player (1, 2)
-        :type: int
-        :return: the player
-        :rtype: Player
-        :raise: ValueError if number is not 1 or 2
+        :return: the current state of every node
+        :rtype: dict
         """
 
-        if number == 1:
-            return self.player_1
-        elif number == 2:
-            return self.player_2
-        else:
-            raise ValueError
+        return self.__field.get_states()
 
-    def __read_node(self, valid_set):
+    def remove_chip(self, node):
         """
-        reads a node from the console and checks whether node is valid until input is valid and returns this node
+        reads in a node and removes this chip of the opponent from the play board
 
-        :param valid_set: the set of valid notes
-        :type: set
-        :return: the read-in node
-        :rtype: tuple
+        :param node: the position of the chip to remove
+        :type node: tuple
+        :raise: MoveException if player has no chip in a mill or if node is not removeable
         """
 
-        while True:
-            try:
-                node = input()
-                node = make_tuple(node)
-
-                if node in valid_set:
-                    return node
-                else:
-                    # raise ValueError if node is not in valid_set
-                    raise ValueError
-            # SyntaxError is raised by make_tuple if String is not a tuple
-            except (ValueError, SyntaxError):
-                print("Input is not a valid node! Try again:")
-
-    # remove a chip of the opponent from the play board
-    def __remove_chip(self):
-        """reads in a node and removes this chip of the opponent from the play board"""
+        if not self.__mill:
+            raise MoveException("There is no mill.")
 
         # all chips of the opponent are candidates to remove
-        possible_nodes_candidates = self.field.get_nodes_by_state(self.__get_number_of_opponent())
+        possible_nodes_candidates = self.__field.get_nodes_by_state(self.__get_opponent().number)
 
         # chips in a mill are not removeable
         possible_nodes = set()
         for i in possible_nodes_candidates:
-            if not self.field.is_in_mill(i):
+            if not self.__field.is_in_mill(i):
                 possible_nodes.add(i)
         frozenset(possible_nodes)
 
@@ -452,213 +661,109 @@ class Game:
         if possible_nodes == frozenset({}):
             possible_nodes = possible_nodes_candidates
 
-        print("Which chip would you like to remove?:")
-        node = self.__read_node(possible_nodes)
-        self.field.set_node_state(node, 0)
+        if node in possible_nodes:
+            self.__field.set_node_state(node, 0)
+            print("Remove chip of {}".format(node))
+            self.__field.print_playboard()
+            self.__mill = False
+            # decrease move_counter
+            self.__move_counter = 0
+            self.__check_on_win_and_remis()
+            self.__change_to_phase_3()
+            self.__change_turn()
 
-    def __check_on_mill(self, node):
+        else:
+            raise MoveException("Chip is not removeable")
+
+    def check_on_mill(self, node):
         """
-        checks if node is in mill, if it is in mill remove one chip
+        checks if node is in mill
 
         :param node: the node in the graph to check
+        :type node: tuple
+        :return: True if node is in mill
+        :rtype: bool
         """
-        if self.field.is_in_mill(node):
-            # remove a chip of the opponent
-            self.__remove_chip()
-            # decrease move_counter bcause move_counter is increased in every move. The move after a mill is the first
-            # not second move.
-            self.move_counter = -1
 
-    def __check_history(self):
-        """returns True if current field is not more than 2 times in history"""
-        duplicates = {}
-        for field in self.history:
-            if field in duplicates:
-                duplicates[field] += 1
-                if duplicates[field] >= 3:
-                    return False
-            else:
-                duplicates[field] = 1
-        return True
+        return self.__field.is_in_mill(node)
 
-    def __change_to_phase_2(self):
-        """changes phase of player to 2 if player have no chips"""
-        player = self.__get_player_by_number(self.turn)
-        if player.number_chips == 0:
-            player.phase = 2
+    def move(self, start_pos, end_pos):
+        """
+        one move in the game
 
-    def __change_to_phase_3(self):
-        """changes phase of player to 3 if player have less than 3 chips on the play board"""
-        opponent_number = self.__get_number_of_opponent()
-        opponent = self.__get_player_by_number(opponent_number)
+        :param start_pos: current position of the chip, None if you want to put a chip in phase 1
+        :type start_pos: tuple
+        :param end_pos: new position of the chip
+        :type end_pos: tuple
+        :raise: MillException if there is a mill and no chip has been removed
+        """
 
-        if len(self.field.get_nodes_by_state(opponent_number)) < 4 and opponent.number_chips == 0:
-            opponent.phase = 3
-
-    def __phase_1(self):
-        """move in phase=1"""
-        player = self.__get_player_by_number(self.turn)
-
-        # a chip can be placed on every empty node on the play board
-        possible_nodes = self.field.get_nodes_by_state(0)
-
-        # read node from the console
-        print("Set chip on position:")
-        node = self.__read_node(possible_nodes)
-
-        # put chip on play board
-        self.field.set_node_state(node, self.turn)
-        player.put_chip()
-
-        # check node on mill
-        self.__check_on_mill(node)
-
-        # change to phase_2
-        self.__change_to_phase_2()
-
-        # change to phase_3
-        self.__change_to_phase_3()
-
-    def __phase_2(self):
-        """move in phase=2"""
-        # try as long as the input is a valid move
-        while True:
-            try:
-                # player loose if there is not any chip he can move
-                # if the player looses Game exception is thrown
-                if not self.field.check_exist_edges_of_state(self.turn, 0):
-                    raise GameException(False, self.turn, self.__get_number_of_opponent())
-
-                # the player can move only his own chips
-                possible_nodes = self.field.get_nodes_by_state(self.turn)
-
-                # read the node from the console
-                print("Choose the chip you want to move:")
-                node = self.__read_node(possible_nodes)
-
-                # the player can move the chip only to a node that is empty
-                possible_edges = self.field.get_edges_by_state(node, 0)
-
-                # if the set of possible edges is empty, the chip can not be move -> invalid move
-                if len(possible_edges) == 0:
-                    raise ValueError
-
-                # read the edge node from the console and check if it is valid
-                print("Choose position where you want to put your chip:")
-                edge = self.__read_node(possible_edges)
-
-                break
-            except ValueError:
-                print("Invalid move! Try again:")
-
-        # update graph (play board)
-        self.field.set_node_state(node, 0)
-        self.field.set_node_state(edge, self.turn)
-
-        # check if the node on the new position is in a mill
-        self.__check_on_mill(edge)
-
-        # change to phase_3
-        self.__change_to_phase_3()
-
-    def __phase_3(self):
-        """move in phase=3"""
-        # the player can move only his own chips
-        possible_nodes = self.field.get_nodes_by_state(self.turn)
-
-        # the player looses if he has less than 3 chips on the play board
-        if len(possible_nodes) < 3:
-            raise GameException(False, self.turn, self.__get_number_of_opponent())
-
-        # read the node from the console and check if it is valid
-        print("Choose chip you want to jump with:")
-        node = self.__read_node(possible_nodes)
-
-        # possible_edges are all nodes with state 0 not only edges because player can jump
-        # the player can jump on every empty node
-        possible_edges = self.field.get_nodes_by_state(0)
-
-        # read the edge node from the console and check if it is valid
-        print("Choose position where you want to put your chip:")
-        edge = self.__read_node(possible_edges)
-
-        # update graph (play board)
-        self.field.set_node_state(node, 0)
-        self.field.set_node_state(edge, self.turn)
-
-        # change to phase_3
-        self.__change_to_phase_3()
-
-        # check if chip is on new position in mill
-        self.__check_on_mill(edge)
-
-    def move(self):
-        """one move in the game"""
-        player = self.__get_player_by_number(self.turn)
-        phase = player.phase
-
-        # print play board
-        self.field.print_playboard()
-
-        # print which player is in turn
-        print("Turn: Player ", self.turn)
-
-        try:
-            if phase == 1:
-                self.__phase_1()
-            elif phase == 2:
-                self.__phase_2()
-            elif phase == 3:
-                self.__phase_3()
-
-            # check on remis
-            if self.move_counter >= 50 or not self.__check_history():
-                raise GameException(True)
-
-        # GameException is raised if one player wins
-        # if GameException is raised show which player won and quit game
-        except GameException as e:
-            print(e.text)
-            quit()
-
-        # change the turn after every valid move, increase move_counter, save state of play board in history
+        # TODO MoveException better?
+        if self.__mill:
+            raise MillException
         else:
-            self.__change_turn()
-            self.move_counter += 1
-            self.history.append(self.field)
+            self.__is_valid_move(start_pos, end_pos)
+
+            if self.__turn.phase == 1:
+                self.__phase_1(end_pos)
+            elif self.__turn.phase == 2:
+                self.__phase_2(start_pos, end_pos)
+            elif self.__turn.phase == 3:
+                self.__phase_3(start_pos, end_pos)
+
+            if not self.__mill:
+                self.__field.print_playboard()
+                self.__move_counter += 1
+                self.__history.append(self.get_field())
+                self.__check_on_win_and_remis()
+                self.__change_turn()
 
 
-class GameException(Exception):
+class MoveException(Exception):
     """
-    The class GameException is a Exception class for the class Game
+    The MoveException class
 
     Attributes:
-        turn (int): the number of the player who is in turn (1, 2)
-        opponent (int): the number of the opponent of the player who is in turn
-        remis (bool): true if remis
-        text (String): text that can be given out
+        msg (str): the message/reason
     """
 
-    def __init__(self, remis, turn=None, opponent=None, text=None):
-        """The constructor for GameException class"""
-        self.remis = remis
-        self.turn = turn
-        self.opponent = opponent
-        if text is None:
-            if remis:
-                self.text = "Remis!!!"
-            else:
-                self.text = "Game over! Player {} won!".format(self.opponent)
-        else:
-            self.text = text
+    def __init__(self, msg):
+        """the constructor for MoveException class"""
+        self.msg = msg
 
 
-if __name__ == "__main__":
-    game = Game()
-    while True:
-        try:
-            game.move()
-        except KeyboardInterrupt:
-            print("Quit? (y/n):", end="")
-            if input() == "y":
-                quit()
+class MillException(Exception):
+    """ The MillException class"""
+
+    def __init__(self):
+        """the constructor for MillException class"""
+        pass
+
+
+class WinException(Exception):
+    """
+    The WinException class
+
+    Attributes:
+        number_winner (int): the number of the player who wins
+        number_looser (int): the number of the player who looses
+    """
+
+    def __init__(self, number_winner, number_looser):
+        """the constructor for WinException class"""
+        self.number_winner = number_winner
+        self.number_looser = number_looser
+
+
+class RemisException(Exception):
+    """
+    The RemisException class
+
+    Attributes:
+        reason (int): the reason of remis 1= more than 50 moves between two mills,
+        2= three times in the play same field status
+    """
+
+    def __init__(self, reason):
+        """the constructor for RemisException class"""
+        self.reason = reason
