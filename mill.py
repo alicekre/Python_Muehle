@@ -338,7 +338,7 @@ class _Player:
         number (int):
     """
 
-    def __init__(self, number, number_chips=4, phase=1):
+    def __init__(self, number, number_chips=9, phase=1):
         """The constructor for Player class"""
         if number not in (1, 2):
             raise ValueError
