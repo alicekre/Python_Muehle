@@ -53,9 +53,12 @@ def main():
         print("Player {} wins, player {} looses".format(e.number_winner, e.number_looser))
         quit()
 
-    # TODO print reason for remis
     except RemisException as e:
         print("Remis! Nobody wins.")
+        if e.reason == 1:
+            print("More than 50 moves between two mills.")
+        elif e.reason == 2:
+            print("Three times in the play same position.")
         quit()
 
     except KeyboardInterrupt:

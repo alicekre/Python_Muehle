@@ -352,6 +352,7 @@ class _Player:
 
         :raise: PlayerException if player has less than 1 chip
         """
+
         if self.number_chips <= 0:
             raise _PlayerException
         else:
@@ -698,7 +699,6 @@ class Game:
         :raise: MillException if there is a mill and no chip has been removed
         """
 
-        # TODO MoveException better?
         if self.__mill:
             raise MillException
         else:
@@ -760,8 +760,9 @@ class RemisException(Exception):
     The RemisException class
 
     Attributes:
-        reason (int): the reason of remis 1= more than 50 moves between two mills,
-        2= three times in the play same field status
+        reason (int): the reason of remis
+                        1= more than 50 moves between two mills,
+                        2= three times in the play same field status
     """
 
     def __init__(self, reason):
