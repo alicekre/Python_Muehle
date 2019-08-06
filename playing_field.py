@@ -66,6 +66,9 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         self.player2.setStyleSheet('QGroupBox {color: black; }')
 
         print("Ausgangszustand")
+        
+    def message(self, message_):
+        print(message_)
 
     def initMe(self):
         edit = token_label("Hello")  # QLabel("gelb_1", self)
