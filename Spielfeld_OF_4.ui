@@ -1296,6 +1296,22 @@
         <pixmap>gelb.png</pixmap>
        </property>
       </widget>
+      <widget class="phase" name="Sp2_phase">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>730</y>
+         <width>57</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Phase1</string>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -1651,6 +1667,22 @@
         <bool>false</bool>
        </property>
       </widget>
+      <widget class="phase" name="Sp1_phase">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>730</y>
+         <width>57</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Phase1</string>
+       </property>
+      </widget>
      </widget>
     </item>
     <item>
@@ -1679,6 +1711,11 @@
    <class>playing_field_label</class>
    <extends>QLabel</extends>
    <header>playing_field_label.h</header>
+  </customwidget>
+  <customwidget>
+   <class>phase</class>
+   <extends>QLabel</extends>
+   <header>phase.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
