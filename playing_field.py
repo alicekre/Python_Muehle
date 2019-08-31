@@ -10,6 +10,9 @@ import sys
 from PyQt5 import QtCore, QtWidgets, uic
 from PyQt5.QtGui import QPixmap
 
+from console import main_logic
+from mill import Game
+
 Ui_MainWindow, WindowBaseClass = uic.loadUiType("Spielfeld_OF_4.ui")
 
 
@@ -26,6 +29,42 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         self.label_111.getPosition()
 
         self.Spielfeld_OF.setAcceptDrops(False)
+
+        # call to start logic
+        #logic = main_logic()
+        game = Game()
+
+        currentPlayer = game.get_turn()
+
+        if currentPlayer == 1:
+            self.player1.setStyleSheet('QGroupBox {color: red; }')
+            self.player2.setStyleSheet('QGroupBox {color: black; }')
+
+        start_pos = None
+        end_pos = (1,1,1)
+        try:
+            game.move(start_pos, end_pos)
+            if game.check_on_mill(end_pos):
+                print("{} is in a mill.".format(end_pos))
+                #while True:
+                #    try:
+                #       game.remove_chip(read_node("Chip to remove: "))
+                #        break
+                #    except MoveException:
+                #        print("Choose valid chip to remove.")
+
+        except ValueError:
+            print("Invalid node. Try again: ")
+
+        currentPlayer = game.get_turn()
+        print(currentPlayer)
+
+        if currentPlayer == 2:
+            self.player1.setStyleSheet('QGroupBox {color: black; }')
+            self.player2.setStyleSheet('QGroupBox {color: red; }')
+
+
+
 
     # self.blue_token = [self.blau_1, self.blau_2, self.blau_3, self.blau_4, self.blau_5, self.blau_6, self.blau_7, self.blau_8, self.blau_9]
     # self.yellow_token = [self.gelb_1, self.gelb_2, self.gelb_3, self.gelb_4, self.gelb_5, self.gelb_6, self.gelb_7, self.gelb_8, self.gelb_9]
