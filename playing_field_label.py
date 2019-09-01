@@ -4,12 +4,20 @@ from PyQt5.QtGui import QImage
 from PyQt5.QtGui import QPixmap, QDrag, QPainter
 from PyQt5.QtWidgets import QLabel, QApplication
 
+
 class playing_field_label(QLabel):
-    def __init__(self, title):
+    game = None
+
+    origin = None
+    target = None
+
+    def __init__(self, title, game):
+        self.game = game
         super().__init__(title)
         self.setAcceptDrops(True)
 
     def dragEnterEvent(self, event):
+        print("SELF_ORIGIN drag enter %s" % playing_field_label.origin)
         if event.mimeData().hasImage():
             print("event accepted")
             event.accept()
@@ -20,15 +28,33 @@ class playing_field_label(QLabel):
     def dropEvent(self, event):
         if event.mimeData().hasImage():
             print("dropEvent")
-            print("target object %s" %self.objectName())
+
+            print("origin object %s" % playing_field_label.origin)
+            if playing_field_label.origin == None:
+                startPos = (0, 0, 0)
+            else:
+                startPos = tuple(map(int, playing_field_label.origin.split("_")[1]))
+
+            playing_field_label.target = self.objectName()
+            print("target object %s" % self.objectName())
+            endpos = tuple(map(int, playing_field_label.target.split("_")[1]))
+
+            print("Origin object: %s | as tuple: %s" % (playing_field_label.origin, startPos))
+            print("Target object: %s | as tuple: %s" % (playing_field_label.target, endpos))
+
+            # origin pos: startPos
+            # target pos: endpos
+            # self.game.move(startPos, endpos)
+
             self.disableDrops()
             # in Spiellogik: update_token_position()
             self.setPixmap(QPixmap.fromImage(QImage(event.mimeData().imageData())))
         else:
-            pass #MyDialog.wrong_setting(event.pos().x, event.pos().y, event.mimeData().imageData())
+            pass  # MyDialog.wrong_setting(event.pos().x, event.pos().y, event.mimeData().imageData())
 
     def mousePressEvent(self, event):
-        print("Pressed")
+        print("\nPressed")
+        playing_field_label.origin = self.objectName()
         if event.button() == Qt.LeftButton:
             self.drag_start_position = event.pos()
             print("source object: %s" % self.objectName())
