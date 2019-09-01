@@ -4,15 +4,19 @@ from PyQt5.QtGui import QImage
 from PyQt5.QtGui import QPixmap, QDrag, QPainter
 from PyQt5.QtWidgets import QLabel, QApplication
 
+from mill import MoveException
+
 
 class playing_field_label(QLabel):
     game = None
+    ui = None
 
     origin = None
     target = None
 
-    def __init__(self, title, game):
+    def __init__(self, title, game, ui):
         self.game = game
+        self.ui = ui
         super().__init__(title)
         self.setAcceptDrops(True)
 
@@ -31,7 +35,7 @@ class playing_field_label(QLabel):
 
             print("origin object %s" % playing_field_label.origin)
             if playing_field_label.origin == None:
-                startPos = (0, 0, 0)
+                startPos = None
             else:
                 startPos = tuple(map(int, playing_field_label.origin.split("_")[1]))
 
@@ -41,6 +45,30 @@ class playing_field_label(QLabel):
 
             print("Origin object: %s | as tuple: %s" % (playing_field_label.origin, startPos))
             print("Target object: %s | as tuple: %s" % (playing_field_label.target, endpos))
+
+            self.ui.player1.setStyleSheet('QGroupBox {color: black; }')
+
+            try:
+                self.game.move(startPos, endpos)
+                if self.game.check_on_mill(endpos):
+                    print("{} is in a mill.".format(endpos))
+                    # while True:
+                    #    try:
+                    #        self.game.remove_chip(read_node("Chip to remove: "))
+                    #        break
+                    #    except MoveException:
+                    #        print("Choose valid chip to remove.")
+            except ValueError:
+                print("Invalid node. Try again: ")
+            except MoveException:
+                print("Invalid move. Try again:MoveAgain ")
+
+            if self.game.get_turn() == 1:
+                self.ui.player1.setStyleSheet('QGroupBox {color: red; }')
+                self.ui.player2.setStyleSheet('QGroupBox {color: black; }')
+            else:
+                self.ui.player1.setStyleSheet('QGroupBox {color: black; }')
+                self.ui.player2.setStyleSheet('QGroupBox {color: red; }')
 
             # origin pos: startPos
             # target pos: endpos

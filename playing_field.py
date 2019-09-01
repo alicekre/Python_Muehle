@@ -27,7 +27,7 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
 
         # new with ppython code due to necessary manual changes in terms of function parameter handover
         ui = Ui_Dialog()
-        ui.setupUi(self, game)
+        ui.setupUi(self, game, ui)
         # old with .ui file
         # self.setupUi(self)
 
@@ -59,9 +59,6 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         currentPlayer = game.get_turn()
         print(currentPlayer)
 
-        if currentPlayer == 2:
-            self.player1.setStyleSheet('QGroupBox {color: black; }')
-            self.player2.setStyleSheet('QGroupBox {color: red; }')
 
     # self.blue_token = [self.blau_1, self.blau_2, self.blau_3, self.blau_4, self.blau_5, self.blau_6, self.blau_7, self.blau_8, self.blau_9]
     # self.yellow_token = [self.gelb_1, self.gelb_2, self.gelb_3, self.gelb_4, self.gelb_5, self.gelb_6, self.gelb_7, self.gelb_8, self.gelb_9]
