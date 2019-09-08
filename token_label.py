@@ -12,6 +12,7 @@ class token_label(QLabel):
         print("Pressed")
         if event.button() == Qt.LeftButton:
             self.drag_start_position = event.pos()
+            print("moved Object: %s" %self.objectName())
 
     def mouseMoveEvent(self, event):
         if not (event.buttons() & Qt.LeftButton):

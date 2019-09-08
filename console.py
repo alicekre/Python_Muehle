@@ -26,36 +26,44 @@ def read_node(msg):
         except (ValueError, SyntaxError):
             print("Input is not a valid node! Try again:")
 
-
-def main():
+def main_logic():
     game = Game()
+    print("Game logic reached")
     try:
-        while True:
-            print("Player {} in turn.".format(game.get_turn()))
-            start_pos = read_node("Choose chip to move: ")
-            end_pos = read_node("Choose new position: ")
-            try:
-                game.move(start_pos, end_pos)
-                if game.check_on_mill(end_pos):
-                    print("{} is in a mill.".format(end_pos))
-                    while True:
-                        try:
-                            game.remove_chip(read_node("Chip to remove: "))
-                            break
-                        except MoveException:
-                            print("Choose valid chip to remove.")
-            except ValueError:
-                print("Invalid node. Try again: ")
-            except MoveException:
-                print("Invalid move. Try again: ")
+        #TODO hier auf Oberfläche anpassen
+        pass
+
+
+
+        #while True:
+        #    print("Player {} in turn.".format(game.get_turn()))
+        #    start_pos = read_node("Choose chip to move: ")
+        #    end_pos = read_node("Choose new position: ")
+        #    try:
+        #        game.move(start_pos, end_pos)
+        #        if game.check_on_mill(end_pos):
+        #            print("{} is in a mill.".format(end_pos))
+        #            while True:
+        #                try:
+        #                    game.remove_chip(read_node("Chip to remove: "))
+        #                    break
+        #                except MoveException:
+        #                    print("Choose valid chip to remove.")
+        #    except ValueError:
+        #        print("Invalid node. Try again: ")
+        #    except MoveException:
+        #        print("Invalid move. Try again: ")
 
     except WinException as e:
         print("Player {} wins, player {} looses".format(e.number_winner, e.number_looser))
         quit()
 
-    # TODO print reason for remis
     except RemisException as e:
         print("Remis! Nobody wins.")
+        if e.reason == 1:
+            print("More than 50 moves between two mills.")
+        elif e.reason == 2:
+            print("Three times in the play same position.")
         quit()
 
     except KeyboardInterrupt:
@@ -65,4 +73,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main_logic()
