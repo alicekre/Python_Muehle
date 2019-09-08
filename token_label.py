@@ -7,9 +7,6 @@ class token_label(QLabel):
     def __init__(self, parent):
         super(QLabel, self).__init__(parent)
         self.show()
-        
-    def saveDialog(self, dialog):
-        self.dialog = dialog
 
     def mousePressEvent(self, event):
         print("Pressed")
@@ -37,5 +34,3 @@ class token_label(QLabel):
         self.clear()
         print("Moving")
         drag.exec_(Qt.MoveAction)
-       
-       
