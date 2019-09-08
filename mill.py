@@ -4,7 +4,7 @@
 # Logic of board game mill
 #
 
-from prettytable import PrettyTable  # just used for printing the play board formatted.
+#from prettytable import PrettyTable  # just used for printing the play board formatted.
 
 
 class _Field:
@@ -233,74 +233,74 @@ class _Field:
             graph[node] = self.get_state(node)
         return graph
 
-    def print_playboard(self):
-        """prints the current graph formatted in a table (play board)"""
-        table = PrettyTable(padding_width=3)
-
-        table.add_row(["(1,1,1) " + str(self.get_state((1, 1, 1))),
-                       "---",
-                       "---",
-                       "(1,1,2) " + str(self.get_state((1, 1, 2))),
-                       "---",
-                       "---",
-                       "(1,1,3) " + str(self.get_state((1, 1, 3)))
-                       ])
-
-        table.add_row(["|",
-                       "(2,1,1) " + str(self.get_state((2, 1, 1))),
-                       "---",
-                       "(2,1,2) " + str(self.get_state((2, 1, 2))),
-                       "---",
-                       "(2,1,3) " + str(self.get_state((2, 1, 3))),
-                       "|"
-                       ])
-
-        table.add_row(["|",
-                       "|",
-                       "(3,1,1) " + str(self.get_state((3, 1, 1))),
-                       "(3,1,2) " + str(self.get_state((3, 1, 2))),
-                       "(3,1,3) " + str(self.get_state((3, 1, 3))),
-                       "|",
-                       "|"
-                       ])
-
-        table.add_row(["(1,2,1) " + str(self.get_state((1, 2, 1))),
-                       "(2,2,1) " + str(self.get_state((2, 2, 1))),
-                       "(3,2,1) " + str(self.get_state((3, 2, 1))),
-                       "",
-                       "(3,2,3) " + str(self.get_state((3, 2, 3))),
-                       "(2,2,3) " + str(self.get_state((2, 2, 3))),
-                       "(1,2,3) " + str(self.get_state((1, 2, 3)))
-                       ])
-
-        table.add_row(["|",
-                       "|",
-                       "(3,3,1) " + str(self.get_state((3, 3, 1))),
-                       "(3,3,2) " + str(self.get_state((3, 3, 2))),
-                       "(3,3,3) " + str(self.get_state((3, 3, 3))),
-                       "|",
-                       "|"
-                       ])
-
-        table.add_row(["|",
-                       "(2,3,1) " + str(self.get_state((2, 3, 1))),
-                       "---",
-                       "(2,3,2) " + str(self.get_state((2, 3, 2))),
-                       "---",
-                       "(2,3,3) " + str(self.get_state((2, 3, 3))),
-                       "|"
-                       ])
-
-        table.add_row(["(1,3,1) " + str(self.get_state((1, 3, 1))),
-                       "---",
-                       "---",
-                       "(1,3,2) " + str(self.get_state((1, 3, 2))),
-                       "---",
-                       "---",
-                       "(1,3,3) " + str(self.get_state((1, 3, 3)))
-                       ])
-
-        print(table)
+#    def print_playboard(self):
+#        """prints the current graph formatted in a table (play board)"""
+#        table = PrettyTable(padding_width=3)
+#
+#        table.add_row(["(1,1,1) " + str(self.get_state((1, 1, 1))),
+#                       "---",
+#                       "---",
+#                       "(1,1,2) " + str(self.get_state((1, 1, 2))),
+#                       "---",
+#                       "---",
+#                       "(1,1,3) " + str(self.get_state((1, 1, 3)))
+#                       ])
+#
+#        table.add_row(["|",
+#                       "(2,1,1) " + str(self.get_state((2, 1, 1))),
+#                       "---",
+#                       "(2,1,2) " + str(self.get_state((2, 1, 2))),
+#                       "---",
+#                       "(2,1,3) " + str(self.get_state((2, 1, 3))),
+#                       "|"
+#                       ])
+#
+#        table.add_row(["|",
+#                       "|",
+#                       "(3,1,1) " + str(self.get_state((3, 1, 1))),
+#                       "(3,1,2) " + str(self.get_state((3, 1, 2))),
+#                       "(3,1,3) " + str(self.get_state((3, 1, 3))),
+#                       "|",
+#                       "|"
+#                       ])
+#
+#        table.add_row(["(1,2,1) " + str(self.get_state((1, 2, 1))),
+#                       "(2,2,1) " + str(self.get_state((2, 2, 1))),
+#                       "(3,2,1) " + str(self.get_state((3, 2, 1))),
+#                       "",
+#                       "(3,2,3) " + str(self.get_state((3, 2, 3))),
+#                       "(2,2,3) " + str(self.get_state((2, 2, 3))),
+#                       "(1,2,3) " + str(self.get_state((1, 2, 3)))
+#                       ])
+#
+#        table.add_row(["|",
+#                       "|",
+#                       "(3,3,1) " + str(self.get_state((3, 3, 1))),
+#                       "(3,3,2) " + str(self.get_state((3, 3, 2))),
+#                       "(3,3,3) " + str(self.get_state((3, 3, 3))),
+#                       "|",
+#                       "|"
+#                       ])
+#
+#        table.add_row(["|",
+#                       "(2,3,1) " + str(self.get_state((2, 3, 1))),
+#                       "---",
+#                       "(2,3,2) " + str(self.get_state((2, 3, 2))),
+#                       "---",
+#                       "(2,3,3) " + str(self.get_state((2, 3, 3))),
+#                       "|"
+#                       ])
+#
+#        table.add_row(["(1,3,1) " + str(self.get_state((1, 3, 1))),
+#                       "---",
+#                       "---",
+#                       "(1,3,2) " + str(self.get_state((1, 3, 2))),
+#                       "---",
+#                       "---",
+#                       "(1,3,3) " + str(self.get_state((1, 3, 3)))
+#                       ])
+#
+#        print(table)
 
     def check_exist_edges_of_state(self, node_state, edge_state):
         """
@@ -365,6 +365,8 @@ class _PlayerException(Exception):
         """The constructor for the PlayerException class"""
         pass
 
+from PyQt5 import QtCore, QtWidgets, uic
+Ui_MainWindow, WindowBaseClass = uic.loadUiType("Spielfeld_OF_4.ui")
 
 class Game:
     """
@@ -400,9 +402,11 @@ class Game:
         if self.__turn is self.__player_1:
             self.__turn = self.__player_2
             print("Changed player in turn to player 2")
+        
         elif self.__turn is self.__player_2:
             self.__turn = self.__player_1
             print("Changed player in turn to player 1")
+            
         else:
             raise ValueError
 
@@ -665,7 +669,7 @@ class Game:
         if node in possible_nodes:
             self.__field.set_node_state(node, 0)
             print("Remove chip of {}".format(node))
-            self.__field.print_playboard()
+            #self.__field.print_playboard()
             self.__mill = False
             # decrease move_counter
             self.__move_counter = 0
@@ -712,7 +716,7 @@ class Game:
                 self.__phase_3(start_pos, end_pos)
 
             if not self.__mill:
-                self.__field.print_playboard()
+                #self.__field.print_playboard()
                 self.__move_counter += 1
                 self.__history.append(self.get_field())
                 self.__check_on_win_and_remis()
