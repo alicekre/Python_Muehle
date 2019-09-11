@@ -442,7 +442,14 @@ class Game:
             else:
                 duplicates[hashable] = 1
         return True
-
+    
+    
+    def get_phase_player_1(self):
+        return self.__player_1.phase
+    def get_phase_player_2(self):
+        return self.__player_2.phase
+        
+    
     def __change_to_phase_2(self):
         """changes phase of player to 2 if player have no chips"""
         player = self.__turn
