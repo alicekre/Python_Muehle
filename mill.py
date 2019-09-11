@@ -4,7 +4,7 @@
 # Logic of board game mill
 #
 
-from prettytable import PrettyTable  # just used for printing the play board formatted.
+#from prettytable import PrettyTable  # just used for printing the play board formatted.
 
 
 class _Field:
@@ -234,73 +234,74 @@ class _Field:
         return graph
 
     def print_playboard(self):
-        """prints the current graph formatted in a table (play board)"""
-        table = PrettyTable(padding_width=3)
-
-        table.add_row(["(1,1,1) " + str(self.get_state((1, 1, 1))),
-                       "---",
-                       "---",
-                       "(1,1,2) " + str(self.get_state((1, 1, 2))),
-                       "---",
-                       "---",
-                       "(1,1,3) " + str(self.get_state((1, 1, 3)))
-                       ])
-
-        table.add_row(["|",
-                       "(2,1,1) " + str(self.get_state((2, 1, 1))),
-                       "---",
-                       "(2,1,2) " + str(self.get_state((2, 1, 2))),
-                       "---",
-                       "(2,1,3) " + str(self.get_state((2, 1, 3))),
-                       "|"
-                       ])
-
-        table.add_row(["|",
-                       "|",
-                       "(3,1,1) " + str(self.get_state((3, 1, 1))),
-                       "(3,1,2) " + str(self.get_state((3, 1, 2))),
-                       "(3,1,3) " + str(self.get_state((3, 1, 3))),
-                       "|",
-                       "|"
-                       ])
-
-        table.add_row(["(1,2,1) " + str(self.get_state((1, 2, 1))),
-                       "(2,2,1) " + str(self.get_state((2, 2, 1))),
-                       "(3,2,1) " + str(self.get_state((3, 2, 1))),
-                       "",
-                       "(3,2,3) " + str(self.get_state((3, 2, 3))),
-                       "(2,2,3) " + str(self.get_state((2, 2, 3))),
-                       "(1,2,3) " + str(self.get_state((1, 2, 3)))
-                       ])
-
-        table.add_row(["|",
-                       "|",
-                       "(3,3,1) " + str(self.get_state((3, 3, 1))),
-                       "(3,3,2) " + str(self.get_state((3, 3, 2))),
-                       "(3,3,3) " + str(self.get_state((3, 3, 3))),
-                       "|",
-                       "|"
-                       ])
-
-        table.add_row(["|",
-                       "(2,3,1) " + str(self.get_state((2, 3, 1))),
-                       "---",
-                       "(2,3,2) " + str(self.get_state((2, 3, 2))),
-                       "---",
-                       "(2,3,3) " + str(self.get_state((2, 3, 3))),
-                       "|"
-                       ])
-
-        table.add_row(["(1,3,1) " + str(self.get_state((1, 3, 1))),
-                       "---",
-                       "---",
-                       "(1,3,2) " + str(self.get_state((1, 3, 2))),
-                       "---",
-                       "---",
-                       "(1,3,3) " + str(self.get_state((1, 3, 3)))
-                       ])
-
-        print(table)
+        pass
+#        """prints the current graph formatted in a table (play board)"""
+#        table = PrettyTable(padding_width=3)
+#
+#        table.add_row(["(1,1,1) " + str(self.get_state((1, 1, 1))),
+#                       "---",
+#                       "---",
+#                       "(1,1,2) " + str(self.get_state((1, 1, 2))),
+#                       "---",
+#                       "---",
+#                       "(1,1,3) " + str(self.get_state((1, 1, 3)))
+#                       ])
+#
+#        table.add_row(["|",
+#                       "(2,1,1) " + str(self.get_state((2, 1, 1))),
+#                       "---",
+#                       "(2,1,2) " + str(self.get_state((2, 1, 2))),
+#                       "---",
+#                       "(2,1,3) " + str(self.get_state((2, 1, 3))),
+#                       "|"
+#                       ])
+#
+#        table.add_row(["|",
+#                       "|",
+#                       "(3,1,1) " + str(self.get_state((3, 1, 1))),
+#                       "(3,1,2) " + str(self.get_state((3, 1, 2))),
+#                       "(3,1,3) " + str(self.get_state((3, 1, 3))),
+#                       "|",
+#                       "|"
+#                       ])
+#
+#        table.add_row(["(1,2,1) " + str(self.get_state((1, 2, 1))),
+#                       "(2,2,1) " + str(self.get_state((2, 2, 1))),
+#                       "(3,2,1) " + str(self.get_state((3, 2, 1))),
+#                       "",
+#                       "(3,2,3) " + str(self.get_state((3, 2, 3))),
+#                       "(2,2,3) " + str(self.get_state((2, 2, 3))),
+#                       "(1,2,3) " + str(self.get_state((1, 2, 3)))
+#                       ])
+#
+#        table.add_row(["|",
+#                       "|",
+#                       "(3,3,1) " + str(self.get_state((3, 3, 1))),
+#                       "(3,3,2) " + str(self.get_state((3, 3, 2))),
+#                       "(3,3,3) " + str(self.get_state((3, 3, 3))),
+#                       "|",
+#                       "|"
+#                       ])
+#
+#        table.add_row(["|",
+#                       "(2,3,1) " + str(self.get_state((2, 3, 1))),
+#                       "---",
+#                       "(2,3,2) " + str(self.get_state((2, 3, 2))),
+#                       "---",
+#                       "(2,3,3) " + str(self.get_state((2, 3, 3))),
+#                       "|"
+#                       ])
+#
+#        table.add_row(["(1,3,1) " + str(self.get_state((1, 3, 1))),
+#                       "---",
+#                       "---",
+#                       "(1,3,2) " + str(self.get_state((1, 3, 2))),
+#                       "---",
+#                       "---",
+#                       "(1,3,3) " + str(self.get_state((1, 3, 3)))
+#                       ])
+#
+#        print(table)
 
     def check_exist_edges_of_state(self, node_state, edge_state):
         """

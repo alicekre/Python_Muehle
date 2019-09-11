@@ -7,13 +7,12 @@ Created on Mon Aug  5 19:44:56 2019
 from PyQt5.QtWidgets import QWidget
 from PyQt5 import QtWidgets
  
-class App(QWidget):
+class Window(QWidget):
     def __init__(self):  
         super().__init__()
-        self.title = 'End'
         self.left = 800
         self.top = 400
-        self.width = 320
+        self.width = 400
         self.height = 200
         
         

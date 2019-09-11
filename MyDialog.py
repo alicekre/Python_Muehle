@@ -14,7 +14,7 @@ from PyQt5.QtGui import QPixmap
 
 from mill import *
 from open_window import Window
-import playing_field_label
+
 
 
 Ui_MainWindow, WindowBaseClass = uic.loadUiType("Spielfeld_OF_4.ui")
