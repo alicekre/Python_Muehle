@@ -4,7 +4,8 @@
 # Logic of board game mill
 #
 
-import logging
+import logging, json
+import time
 from prettytable import PrettyTable  # just used for printing the play board formatted.
 
 # start logging
@@ -331,6 +332,13 @@ class _Field:
                 return True
         return False
 
+    @staticmethod
+    def convert_field(field):
+        field_converted = {}
+        for node in field:
+            field_converted[str(node)] = field[node]
+        return field_converted
+
 
 class _Player:
     """
@@ -386,6 +394,7 @@ class Game:
 
     def __init__(self):
         """The constructor for Game class"""
+        # TODO implement loading data from stored file
         # logger for Game class
         self.logger = logging.getLogger('application.mill.Game')
         self.__player_1 = _Player(1)
@@ -440,7 +449,7 @@ class Game:
         :return: True if current field is not more than 2 times in history
         :rtype: bool
         """
-
+#TODO implement more efficient
         duplicates = {}
         for field in self.__history:
             # dict is unhashable so do workaround
@@ -754,6 +763,42 @@ class Game:
                 if self.__turn.phase in (2, 3):
                     self.__check_on_win_and_remis()
                 self.__change_turn()
+
+    def store(self, filename="savedGames/{}-mill.json".format(time.time())):
+        """
+        saves the game in a json file
+        :param filename: the file name to save the data
+        :type filename: str
+        """
+        # convert field in history into json compatible structure, make keys to strings
+        converted_history = []
+        for field in self.__history:
+            converted_field = _Field.convert_field(field)
+            converted_history.append(converted_field)
+        player_1 = {
+            "number_chips": self.__player_1.number_chips,
+            "phase": self.__player_1.phase
+        }
+        player_2 = {
+            "number_chips": self.__player_2.number_chips,
+            "phase": self.__player_2.phase
+        }
+
+        data = {
+            "field": _Field.convert_field(self.get_field()),
+            "turn": self.__turn.number,
+            "move_counter": self.__move_counter,
+            "history": converted_history,
+            "player_1": player_1,
+            "player_2": player_2,
+            "mill": self.__mill
+        }
+
+        with open(filename, 'w') as f:
+            content = json.dumps(data, indent=4)
+            f.write(content)
+
+        self.logger.info("saved data in {}".format(filename))
 
 
 class MoveException(Exception):

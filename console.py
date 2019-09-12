@@ -84,8 +84,9 @@ def main():
     except KeyboardInterrupt:
         print("Quit? (y/n):", end="")
         if input() == "y":
+            game.store()
             quit()
-
+# TODO implement saving dialog
 
 if __name__ == "__main__":
     main()
