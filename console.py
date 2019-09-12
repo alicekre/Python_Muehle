@@ -16,10 +16,11 @@ fh_1 = logging.FileHandler('debug.log')
 fh_2 = logging.FileHandler('info.log')
 fh_1.setLevel(logging.DEBUG)
 fh_2.setLevel(logging.INFO)
-# create formatter and add it to the handlers
-formatter = logging.Formatter('%(asctime)s - %(name)s : %(funcName)20s, ln %(lineno)4s - %(levelname)8s - %(message)s')
-fh_1.setFormatter(formatter)
-fh_2.setFormatter(formatter)
+# create formatters and add it to the handlers
+formatter_1 = logging.Formatter('%(asctime)s - %(name)25s : %(funcName)30s, ln %(lineno)4s - %(levelname)8s - %(message)s')
+formatter_2 = logging.Formatter('%(asctime)s - %(name)25s : %(levelname)8s - %(message)s')
+fh_1.setFormatter(formatter_1)
+fh_2.setFormatter(formatter_2)
 
 # add the handlers to the logger
 logger.addHandler(fh_1)
