@@ -546,6 +546,7 @@ class Game:
         print("Put chip of Player {} on position {}".format(self.__turn.number, end_pos))
         if self.check_on_mill(end_pos):
             self.__mill = True
+            self.logger.info("{} is in mill".format(end_pos))
             # decrease move_counter because move_counter is increased in every move. The move after a mill is the first
             # not second move.
             self.__move_counter = -1
@@ -569,6 +570,7 @@ class Game:
         # check if the node on the new position is in a mill
         if self.check_on_mill(end_pos):
             self.__mill = True
+            self.logger.info("{} is in mill".format(end_pos))
             # decrease move_counter because move_counter is increased in every move. The move after a mill is the first
             # not second move.
             self.__move_counter = -1
@@ -608,7 +610,7 @@ class Game:
             raise WinException(self.__turn.number, self.__get_opponent().number)
 
         # opponent looses if there is not any chip he can move
-        elif not self.__field.check_exist_edges_of_state(self.__turn.number, 0):
+        elif not self.__field.check_exist_edges_of_state(opponent.number, 0):
             self.logger.debug("raise WinException: Player {} wins".format(self.__turn.number))
             raise WinException(self.__turn.number, self.__get_opponent().number)
 
@@ -706,7 +708,7 @@ class Game:
             self.__change_turn()
 
         else:
-            self.logger.debug("raise MoveException")
+            self.logger.debug("raise MoveException: not valid chip of opponent")
             raise MoveException("Chip is not removeable")
 
     def check_on_mill(self, node):
