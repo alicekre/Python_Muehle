@@ -333,7 +333,14 @@ class _Field:
         return False
 
     @staticmethod
-    def convert_field(field):
+    def convert_field_into_json(field):
+        """
+        converts a field of the format returning by get_states() into a json-able dict (keys are strings)
+
+        :param field: field like return of get_states()
+        :return: json-able dict
+        """
+        
         field_converted = {}
         for node in field:
             field_converted[str(node)] = field[node]
@@ -773,7 +780,7 @@ class Game:
         # convert field in history into json compatible structure, make keys to strings
         converted_history = []
         for field in self.__history:
-            converted_field = _Field.convert_field(field)
+            converted_field = _Field.convert_field_into_json(field)
             converted_history.append(converted_field)
         player_1 = {
             "number_chips": self.__player_1.number_chips,
@@ -785,7 +792,7 @@ class Game:
         }
 
         data = {
-            "field": _Field.convert_field(self.get_field()),
+            "field": _Field.convert_field_into_json(self.get_field()),
             "turn": self.__turn.number,
             "move_counter": self.__move_counter,
             "history": converted_history,
