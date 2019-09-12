@@ -751,7 +751,8 @@ class Game:
                 self.__field.print_playboard()
                 self.__move_counter += 1
                 self.__history.append(self.get_field())
-                self.__check_on_win_and_remis()
+                if self.__turn.phase in (2, 3):
+                    self.__check_on_win_and_remis()
                 self.__change_turn()
 
 
