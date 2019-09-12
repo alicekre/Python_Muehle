@@ -4,7 +4,11 @@
 # Logic of board game mill
 #
 
+import logging
 from prettytable import PrettyTable  # just used for printing the play board formatted.
+
+# start logging
+module_log = logging.getLogger('application.mill')
 
 
 class _Field:
@@ -382,6 +386,8 @@ class Game:
 
     def __init__(self):
         """The constructor for Game class"""
+        # logger for Game class
+        self.logger = logging.getLogger('application.mill.Game')
         self.__player_1 = _Player(1)
         self.__player_2 = _Player(2)
         self.__field = _Field()
@@ -389,6 +395,7 @@ class Game:
         self.__move_counter = 0
         self.__history = []
         self.__mill = False
+        self.logger.debug("New Game instance created")
 
     def __change_turn(self):
         """
@@ -399,11 +406,14 @@ class Game:
 
         if self.__turn is self.__player_1:
             self.__turn = self.__player_2
+            self.logger.info("changed turn to 2")
             print("Changed player in turn to player 2")
         elif self.__turn is self.__player_2:
             self.__turn = self.__player_1
+            self.logger.info("changed turn to 1")
             print("Changed player in turn to player 1")
         else:
+            self.logger.error("raise ValueError")
             raise ValueError
 
     def __get_opponent(self):
@@ -420,6 +430,7 @@ class Game:
         elif self.__turn is self.__player_2:
             return self.__player_1
         else:
+            self.logger.error("raise ValueError")
             raise ValueError
 
     def __check_history(self):
@@ -447,6 +458,7 @@ class Game:
         player = self.__turn
         if player.number_chips == 0:
             player.phase = 2
+            self.logger.info("changed Player {} into phase 2".format(player.number))
             print("Changed Player {} into move phase".format(player.number))
 
     def __change_to_phase_3(self):
@@ -454,6 +466,7 @@ class Game:
         opponent = self.__get_opponent()
         if len(self.__field.get_nodes_by_state(opponent.number)) < 4 and opponent.number_chips == 0:
             opponent.phase = 3
+            self.logger.info("changed Player {} into phase 3".format(opponent.number))
             print("Changed Player {} into jump phase".format(opponent.number))
 
     def __check_phase_1(self, start_pos, end_pos):
@@ -468,10 +481,13 @@ class Game:
         """
 
         if start_pos is not None:
+            self.logger.debug("raise MoveException: player is in phase 1, start_pos must be None")
             raise MoveException("Player is in putting phase.")
         if self.__field.get_state(end_pos) != 0:
+            self.logger.debug("raise MoveException: one chip is already on {}".format(end_pos))
             raise MoveException("There is already a chip on this position.")
         if self.__turn.number_chips < 1:
+            self.logger.debug("raise MoveException: no chips")
             raise MoveException("Player has no chips to set.")
 
     def __check_phase_2(self, start_pos, end_pos):
@@ -488,10 +504,12 @@ class Game:
         valid_start = self.__field.get_nodes_by_state(self.__turn.number)
 
         if start_pos not in valid_start:
+            self.logger.debug("raise MoveException: chip is not of player in turn")
             raise MoveException("Chip is not of Player {}.".format(self.__turn.number))
 
         valid_end = self.__field.get_edges_by_state(start_pos, 0)
         if end_pos not in valid_end:
+            self.logger.debug("raise MoveException: chip can not be moved")
             raise MoveException("Chip can not be moved to this position.")
 
     def __check_phase_3(self, start_pos, end_pos):
@@ -508,8 +526,10 @@ class Game:
         valid_start = self.__field.get_nodes_by_state(self.__turn.number)
         valid_end = self.__field.get_nodes_by_state(0)
         if start_pos not in valid_start:
+            self.logger.debug("raise MoveException: chip not of player in turn")
             raise MoveException("Chip is not of Player {}.".format(self.__turn.number))
         if end_pos not in valid_end:
+            self.logger.debug("raise MoveException: chip can not be moved")
             raise MoveException("Chip can not be moved to this position.")
 
     def __phase_1(self, end_pos):
@@ -522,6 +542,7 @@ class Game:
 
         self.__field.set_node_state(end_pos, self.__turn.number)
         self.__turn.put_chip()
+        self.logger.info("Put chip of Player {} on {}".format(self.__turn.number, end_pos))
         print("Put chip of Player {} on position {}".format(self.__turn.number, end_pos))
         if self.check_on_mill(end_pos):
             self.__mill = True
@@ -543,6 +564,7 @@ class Game:
         # update graph (play board)
         self.__field.set_node_state(start_pos, 0)
         self.__field.set_node_state(end_pos, self.__turn.number)
+        self.logger.info("move chip of Player {} from {} to {}".format(self.__field.get_state(start_pos), start_pos, end_pos))
 
         # check if the node on the new position is in a mill
         if self.check_on_mill(end_pos):
@@ -564,10 +586,12 @@ class Game:
         # update graph (play board)
         self.__field.set_node_state(start_pos, 0)
         self.__field.set_node_state(end_pos, self.__turn.number)
+        self.logger.info("move chip of Player {} from {} to {}".format(self.__field.get_state(start_pos), start_pos, end_pos))
 
         # check if the node on the new position is in a mill
         if self.check_on_mill(end_pos):
             self.__mill = True
+            self.logger.info("{} is in mill".format(end_pos))
 
     def __check_on_win_and_remis(self):
         """
@@ -580,17 +604,21 @@ class Game:
         opponent = self.__get_opponent()
         # the opponent looses if he has less than 3 chips on the play board
         if len(self.__field.get_nodes_by_state(opponent.number)) < 3 and opponent.number_chips == 0:
+            self.logger.debug("raise WinException: Player {} wins".format(self.__turn.number))
             raise WinException(self.__turn.number, self.__get_opponent().number)
 
         # opponent looses if there is not any chip he can move
         elif not self.__field.check_exist_edges_of_state(self.__turn.number, 0):
+            self.logger.debug("raise WinException: Player {} wins".format(self.__turn.number))
             raise WinException(self.__turn.number, self.__get_opponent().number)
 
         # check on remis
         elif self.__move_counter >= 50:
+            self.logger.debug("raise RemisException: 50 moves no mill")
             raise RemisException(1)
 
         elif not self.__check_history():
+            self.logger.debug("raise RemisException: 3 times same position")
             raise RemisException(2)
 
     def __is_valid_move(self, start_pos, end_pos):
@@ -606,6 +634,7 @@ class Game:
 
         nodes = self.__field.get_nodes()
         if (start_pos not in nodes or start_pos is None) and end_pos not in nodes:
+            self.logger.debug("raise ValueError")
             raise ValueError
         if self.__turn.phase == 1:
             self.__check_phase_1(start_pos, end_pos)
@@ -614,6 +643,7 @@ class Game:
         elif self.__turn.phase == 3:
             self.__check_phase_3(start_pos, end_pos)
         else:
+            self.logger.debug("raise ValueError")
             raise ValueError
 
     def get_turn(self):
@@ -646,6 +676,7 @@ class Game:
         """
 
         if not self.__mill:
+            self.logger.debug("raise MoveException: no mill")
             raise MoveException("There is no mill.")
 
         # all chips of the opponent are candidates to remove
@@ -664,6 +695,7 @@ class Game:
 
         if node in possible_nodes:
             self.__field.set_node_state(node, 0)
+            self.logger.info("remove chip on {}".format(node))
             print("Remove chip of {}".format(node))
             self.__field.print_playboard()
             self.__mill = False
@@ -674,6 +706,7 @@ class Game:
             self.__change_turn()
 
         else:
+            self.logger.debug("raise MoveException")
             raise MoveException("Chip is not removeable")
 
     def check_on_mill(self, node):
@@ -700,6 +733,7 @@ class Game:
         """
 
         if self.__mill:
+            self.logger.debug("raise MillException: mill exists")
             raise MillException
         else:
             self.__is_valid_move(start_pos, end_pos)

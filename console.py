@@ -4,8 +4,26 @@
 #
 
 
+import logging
 from mill import *
 from ast import literal_eval as make_tuple
+
+# create logger
+logger = logging.getLogger('application')
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages and another which logs even info messages
+fh_1 = logging.FileHandler('debug.log')
+fh_2 = logging.FileHandler('info.log')
+fh_1.setLevel(logging.DEBUG)
+fh_2.setLevel(logging.INFO)
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(asctime)s - %(name)s : %(funcName)20s, ln %(lineno)4s - %(levelname)8s - %(message)s')
+fh_1.setFormatter(formatter)
+fh_2.setFormatter(formatter)
+
+# add the handlers to the logger
+logger.addHandler(fh_1)
+logger.addHandler(fh_2)
 
 
 def read_node(msg):
@@ -28,6 +46,7 @@ def read_node(msg):
 
 
 def main():
+    logger.info("start new game")
     game = Game()
     try:
         while True:
