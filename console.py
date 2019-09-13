@@ -48,7 +48,11 @@ def read_node(msg):
 
 def main():
     logger.info("start new game")
-    game = Game()
+    print("Do you want to load a saved Game? (y/n):", end="")
+    if input() == "y":
+        Game(input("Enter path to file: "))
+    else:
+        game = Game()
     try:
         while True:
             print("Player {} in turn.".format(game.get_turn()))
@@ -82,11 +86,14 @@ def main():
         quit()
 
     except KeyboardInterrupt:
-        print("Quit? (y/n):", end="")
+        print("Do you want to save the game? (y/n):", end="")
         if input() == "y":
             game.store()
             quit()
-# TODO implement saving dialog
+        print("Quit without saving? (y/n):", end="")
+        if input() == "y":
+            quit()
+
 
 if __name__ == "__main__":
     main()

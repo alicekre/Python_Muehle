@@ -4,9 +4,11 @@
 # Logic of board game mill
 #
 
-import logging, json
+import logging
+import json
 import time
 from prettytable import PrettyTable  # just used for printing the play board formatted.
+from ast import literal_eval as make_tuple
 
 # start logging
 module_log = logging.getLogger('application.mill')
@@ -25,8 +27,13 @@ class _Field:
         __field (dictionary): The graph (play board).
     """
 
-    def __init__(self):
-        """The constructor for _Field class"""
+    def __init__(self, field=None):
+        """
+        The constructor for _Field class
+
+        :param field: the field with states
+        :type field: dict
+        """
         self.__field = {(1, 1, 1): [frozenset({(1, 2, 1), (1, 1, 2)}), 0],
                         (1, 1, 2): [frozenset({(1, 1, 1), (1, 1, 3), (2, 1, 2)}), 0],
                         (1, 1, 3): [frozenset({(1, 1, 2), (1, 2, 3)}), 0],
@@ -52,6 +59,10 @@ class _Field:
                         (3, 3, 2): [frozenset({(3, 3, 1), (3, 3, 3), (2, 3, 2)}), 0],
                         (3, 3, 3): [frozenset({(3, 3, 2), (3, 2, 3)}), 0]
                         }
+
+        if field is not None:
+            for node in self.__field:
+                self.set_node_state(node, field[node])
 
     def get_nodes(self):
         """
@@ -339,11 +350,26 @@ class _Field:
 
         :param field: field like return of get_states()
         :return: json-able dict
+        :rtype: dict
         """
-        
+
         field_converted = {}
         for node in field:
             field_converted[str(node)] = field[node]
+        return field_converted
+
+    @staticmethod
+    def convert_field_from_json(field):
+        """
+        converts a field in json format into a dict (keys are tuples)
+
+        :param field: field in json format
+        :return: field
+        :rtype: dict
+        """
+        field_converted = {}
+        for node in field:
+            field_converted[make_tuple(node)] = field[node]
         return field_converted
 
 
@@ -359,7 +385,7 @@ class _Player:
 
     def __init__(self, number, number_chips=9, phase=1):
         """The constructor for Player class"""
-        if number not in (1, 2):
+        if number not in (1, 2) or number_chips not in range(0, 10) or phase not in (1, 2, 3):
             raise ValueError
         self.number = number
         self.number_chips = number_chips
@@ -399,19 +425,67 @@ class Game:
         __mill (bool): indicates if there is a mill and no chip was removed
     """
 
-    def __init__(self):
-        """The constructor for Game class"""
-        # TODO implement loading data from stored file
+    def __init__(self, filename=None):
+        """
+        The constructor for Game class
+
+        :param filename: path to file
+        :type filename: str
+        """
         # logger for Game class
         self.logger = logging.getLogger('application.mill.Game')
-        self.__player_1 = _Player(1)
-        self.__player_2 = _Player(2)
-        self.__field = _Field()
-        self.__turn = self.__player_1
-        self.__move_counter = 0
-        self.__history = []
-        self.__mill = False
-        self.logger.debug("New Game instance created")
+
+        # load stored data
+        if filename is not None:
+            # convert fields from json to dict
+            data = Game.__convert_from_json(filename)
+
+            # initialize attributes with stored data
+            self.__player_1 = _Player(1, data["player_1"]["number_chips"], data["player_1"]["phase"])
+            self.__player_2 = _Player(2, data["player_2"]["number_chips"], data["player_2"]["phase"])
+            self.__field = _Field(data["field"])
+
+            if data["turn"] == 1:
+                self.__turn = self.__player_1
+            elif data["turn"] == 2:
+                self.__turn = self.__player_2
+
+            self.__move_counter = data["move_counter"]
+            self.__history = data["history"]
+            self.__mill = data["mill"]
+            self.logger.debug("New Game instance created from file")
+
+        else:
+            # no stored data
+            self.__player_1 = _Player(1)
+            self.__player_2 = _Player(2)
+            self.__field = _Field()
+            self.__turn = self.__player_1
+            self.__move_counter = 0
+            self.__history = []
+            self.__mill = False
+            self.logger.debug("New Game instance created")
+
+    @staticmethod
+    def __convert_from_json(filename):
+        """
+
+        :param filename: filename of the json file
+        :type filename: str
+        :return: a dict with all the data
+        :rtype: dict
+        """
+        with open(filename, 'r') as f:
+            content = json.load(f)
+
+        content["field"] = _Field.convert_field_from_json(content["field"])
+
+        converted_history = []
+        for field in content["history"]:
+            converted_history.append(_Field.convert_field_from_json(field))
+        content["history"] = converted_history
+
+        return content
 
     def __change_turn(self):
         """
@@ -456,7 +530,7 @@ class Game:
         :return: True if current field is not more than 2 times in history
         :rtype: bool
         """
-#TODO implement more efficient
+# TODO implement more efficient
         duplicates = {}
         for field in self.__history:
             # dict is unhashable so do workaround
@@ -581,7 +655,8 @@ class Game:
         # update graph (play board)
         self.__field.set_node_state(start_pos, 0)
         self.__field.set_node_state(end_pos, self.__turn.number)
-        self.logger.info("move chip of Player {} from {} to {}".format(self.__field.get_state(start_pos), start_pos, end_pos))
+        self.logger.info("move chip of Player {} from {} to {}".format(self.__field.get_state(start_pos), start_pos,
+                                                                       end_pos))
 
         # check if the node on the new position is in a mill
         if self.check_on_mill(end_pos):
@@ -604,7 +679,8 @@ class Game:
         # update graph (play board)
         self.__field.set_node_state(start_pos, 0)
         self.__field.set_node_state(end_pos, self.__turn.number)
-        self.logger.info("move chip of Player {} from {} to {}".format(self.__field.get_state(start_pos), start_pos, end_pos))
+        self.logger.info("move chip of Player {} from {} to {}".format(self.__field.get_state(start_pos), start_pos,
+                                                                       end_pos))
 
         # check if the node on the new position is in a mill
         if self.check_on_mill(end_pos):
@@ -802,8 +878,7 @@ class Game:
         }
 
         with open(filename, 'w') as f:
-            content = json.dumps(data, indent=4)
-            f.write(content)
+            json.dump(data, f, indent=4)
 
         self.logger.info("saved data in {}".format(filename))
 
