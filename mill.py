@@ -452,6 +452,16 @@ class Game:
 
             self.__move_counter = data["move_counter"]
             self.__history = data["history"]
+
+            # initialize history_counter with stored history
+            for field in self.__history:
+                # dict is not hashable so do workaround
+                hashable = frozenset(field.items())
+                if hashable in self.__history_counter:
+                    self.__history_counter[hashable] += 1
+                else:
+                    self.__history_counter[hashable] = 1
+
             self.__mill = data["mill"]
             self.logger.debug("New Game instance created from file")
 
@@ -463,6 +473,7 @@ class Game:
             self.__turn = self.__player_1
             self.__move_counter = 0
             self.__history = []
+            self.__history_counter = {}
             self.__mill = False
             self.logger.debug("New Game instance created")
 
@@ -486,6 +497,21 @@ class Game:
         content["history"] = converted_history
 
         return content
+
+    def __add_to_history(self):
+        """adds current field to history"""
+        field = self.get_field()
+
+        # add field in history
+        self.__history.append(field)
+
+        # add field to counting hashtable
+        # dict in not hashable so do workaround
+        hashable = frozenset(field.items())
+        if hashable in self.__history_counter:
+            self.__history_counter[hashable] += 1
+        else:
+            self.__history_counter[hashable] = 1
 
     def __change_turn(self):
         """
@@ -530,17 +556,9 @@ class Game:
         :return: True if current field is not more than 2 times in history
         :rtype: bool
         """
-# TODO implement more efficient
-        duplicates = {}
-        for field in self.__history:
-            # dict is unhashable so do workaround
-            hashable = frozenset(field.items())
-            if hashable in duplicates:
-                duplicates[hashable] += 1
-                if duplicates[hashable] >= 3:
-                    return False
-            else:
-                duplicates[hashable] = 1
+        for field in self.__history_counter:
+            if self.__history_counter[field] >= 3:
+                return False
         return True
 
     def __change_to_phase_2(self):
@@ -842,7 +860,7 @@ class Game:
             if not self.__mill:
                 self.__field.print_playboard()
                 self.__move_counter += 1
-                self.__history.append(self.get_field())
+                self.__add_to_history()
                 if self.__turn.phase in (2, 3):
                     self.__check_on_win_and_remis()
                 self.__change_turn()
