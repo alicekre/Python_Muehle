@@ -10,7 +10,7 @@ import time
 from prettytable import PrettyTable  # just used for printing the play board formatted.
 from ast import literal_eval as make_tuple
 
-# start logging
+# create logger for module
 module_log = logging.getLogger('application.mill')
 
 
@@ -24,7 +24,7 @@ class _Field:
     State = 0: no chip, state = 1: chip of player_1, state = 2: chip of player_2.
 
     Attributes:
-        __field (dictionary): The graph (play board).
+        __field (dict): The graph (play board).
     """
 
     def __init__(self, field=None):
@@ -387,6 +387,7 @@ class _Player:
         """The constructor for Player class"""
         if number not in (1, 2) or number_chips not in range(0, 10) or phase not in (1, 2, 3):
             raise ValueError
+        # TODO make number and number_chips private
         self.number = number
         self.number_chips = number_chips
         self.phase = phase
@@ -410,6 +411,8 @@ class _PlayerException(Exception):
         """The constructor for the PlayerException class"""
         pass
 
+# TODO make separate Storage class
+
 
 class Game:
     """
@@ -422,6 +425,7 @@ class Game:
         __turn (Player): The player who is in turn
         __move_counter (int): counts the moves between two mills
         __history (list): list of dict with nodes and states
+        __history_counter (dict): hashtable to count equal items in __history
         __mill (bool): indicates if there is a mill and no chip was removed
     """
 
@@ -480,17 +484,21 @@ class Game:
     @staticmethod
     def __convert_from_json(filename):
         """
+        converts json file into dict
 
         :param filename: filename of the json file
         :type filename: str
         :return: a dict with all the data
         :rtype: dict
         """
+        # open json-file
         with open(filename, 'r') as f:
             content = json.load(f)
 
+        # convert field
         content["field"] = _Field.convert_field_from_json(content["field"])
 
+        # convert history
         converted_history = []
         for field in content["history"]:
             converted_history.append(_Field.convert_field_from_json(field))
@@ -725,10 +733,12 @@ class Game:
             raise WinException(self.__turn.number, self.__get_opponent().number)
 
         # check on remis
+        # 50 moves without mill
         elif self.__move_counter >= 50:
             self.logger.debug("raise RemisException: 50 moves no mill")
             raise RemisException(1)
 
+        # 3 times same state of the play board
         elif not self.__check_history():
             self.logger.debug("raise RemisException: 3 times same position")
             raise RemisException(2)
@@ -745,9 +755,12 @@ class Game:
         """
 
         nodes = self.__field.get_nodes()
+        # check whether nodes are valid
         if (start_pos not in nodes or start_pos is None) and end_pos not in nodes:
             self.logger.debug("raise ValueError")
             raise ValueError
+
+        # check whether move is valid for the phase of the player
         if self.__turn.phase == 1:
             self.__check_phase_1(start_pos, end_pos)
         elif self.__turn.phase == 2:
@@ -787,6 +800,7 @@ class Game:
         :raise: MoveException if player has no chip in a mill or if node is not removeable
         """
 
+        # check whether mill really exists
         if not self.__mill:
             self.logger.debug("raise MoveException: no mill")
             raise MoveException("There is no mill.")
@@ -811,7 +825,7 @@ class Game:
             print("Remove chip of {}".format(node))
             self.__field.print_playboard()
             self.__mill = False
-            # decrease move_counter
+            # decrease move_counter to 0
             self.__move_counter = 0
             self.__check_on_win_and_remis()
             self.__change_to_phase_3()
@@ -844,10 +858,12 @@ class Game:
         :raise: MillException if there is a mill and no chip has been removed
         """
 
+        # check whether mill exists
         if self.__mill:
             self.logger.debug("raise MillException: mill exists")
             raise MillException
         else:
+            # check whether move is valid
             self.__is_valid_move(start_pos, end_pos)
 
             if self.__turn.phase == 1:
@@ -857,6 +873,7 @@ class Game:
             elif self.__turn.phase == 3:
                 self.__phase_3(start_pos, end_pos)
 
+            # if there is no mill finish move
             if not self.__mill:
                 self.__field.print_playboard()
                 self.__move_counter += 1
@@ -895,6 +912,7 @@ class Game:
             "mill": self.__mill
         }
 
+        # write data into json-file
         with open(filename, 'w') as f:
             json.dump(data, f, indent=4)
 
