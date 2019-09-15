@@ -14,7 +14,7 @@ from ast import literal_eval as make_tuple
 module_log = logging.getLogger('application.mill')
 
 
-class _Field:
+class Field:
     """
     This class represents the play board as undirected graph.
 
@@ -343,19 +343,15 @@ class _Field:
                 return True
         return False
 
-    @staticmethod
-    def convert_field_into_json(field):
-        """
-        converts a field of the format returning by get_states() into a json-able dict (keys are strings)
-
-        :param field: field like return of get_states()
-        :return: json-able dict
-        :rtype: dict
+    def get_converted_json(self):
         """
 
+
+        :return:
+        """
         field_converted = {}
-        for node in field:
-            field_converted[str(node)] = field[node]
+        for node in self.__field:
+            field_converted[str(node)] = self.__field[node]
         return field_converted
 
     @staticmethod
@@ -373,7 +369,7 @@ class _Field:
         return field_converted
 
 
-class _Player:
+class Player:
     """
     The class Player represents a player in the game
 
@@ -417,12 +413,12 @@ class _Player:
         """
 
         if self.__number_chips <= 0:
-            raise _PlayerException
+            raise PlayerException
         else:
             self.__number_chips -= 1
 
 
-class _PlayerException(Exception):
+class PlayerException(Exception):
     """The class PlayerException is a Exception class for the class Player"""
     def __init__(self):
         """The constructor for the PlayerException class"""
@@ -467,6 +463,10 @@ class History:
 
         self.__move_counter = move_counter
 
+    def get_fields(self):
+        """"""
+        return self.__fields
+
     def get_move_counter(self):
         """
         returns the value of move_counter
@@ -481,7 +481,7 @@ class History:
         adds a field to history
 
         :param field: the field to add in history
-        :type field: _Field
+        :type field: Field
         """
         # add field in history
         self.__fields.append(field)
@@ -528,7 +528,7 @@ class Game:
         __mill (bool): indicates if there is a mill and no chip was removed
     """
 
-    def __init__(self, player_1=_Player(1), player_2=_Player(2), field=_Field(), turn=None, history=History(),
+    def __init__(self, player_1=Player(1), player_2=Player(2), field=Field(), turn=None, history=History(),
                  mill=False):
         """
 
@@ -556,6 +556,7 @@ class Game:
         self.__mill = mill
         self.logger.debug("New Game instance created")
 
+    # TODO delete method
     @staticmethod
     def __convert_from_json(filename):
         """
@@ -571,12 +572,12 @@ class Game:
             content = json.load(f)
 
         # convert field
-        content["field"] = _Field.convert_field_from_json(content["field"])
+        content["field"] = Field.convert_field_from_json(content["field"])
 
         # convert history
         converted_history = []
         for field in content["history"]:
-            converted_history.append(_Field.convert_field_from_json(field))
+            converted_history.append(Field.convert_field_from_json(field))
         content["history"] = converted_history
 
         return content
@@ -605,7 +606,7 @@ class Game:
         returns the player who is not in turn
 
         :return: the player who is not in turn
-        :rtype: _Player
+        :rtype: Player
         :raise: ValueError if Player is not player_1 or player_2
         """
 
@@ -830,6 +831,20 @@ class Game:
             self.logger.debug("raise ValueError")
             raise ValueError
 
+    def get_history(self):
+        """
+
+        :return:
+        """
+        return self.__history
+
+    def get_field_instance(self):
+        """
+
+        :return:
+        """
+        return self.__field
+
     def get_turn(self):
         """
         returns the the number of the player who is in turn
@@ -849,6 +864,18 @@ class Game:
         """
 
         return self.__field.get_states()
+
+    def get_player_1(self):
+        """"""
+        return self.__player_1
+
+    def get_player_2(self):
+        """"""
+        return self.__player_2
+
+    def get_mill(self):
+        """"""
+        return self.__mill
 
     def remove_chip(self, node):
         """
@@ -940,42 +967,6 @@ class Game:
                 if self.__turn.phase in (2, 3):
                     self.__check_on_win_and_remis()
                 self.__change_turn()
-
-    # def store(self, filename="savedGames/{}-mill.json".format(time.time())):
-    #     """
-    #     saves the game in a json file
-    #     :param filename: the file name to save the data
-    #     :type filename: str
-    #     """
-    #     # convert field in history into json compatible structure, make keys to strings
-    #     converted_history = []
-    #     for field in self.__history:
-    #         converted_field = _Field.convert_field_into_json(field)
-    #         converted_history.append(converted_field)
-    #     player_1 = {
-    #         "number_chips": self.__player_1.get_number_chips(),
-    #         "phase": self.__player_1.phase
-    #     }
-    #     player_2 = {
-    #         "number_chips": self.__player_2.get_number_chips(),
-    #         "phase": self.__player_2.phase
-    #     }
-    #
-    #     data = {
-    #         "field": _Field.convert_field_into_json(self.get_field()),
-    #         "turn": self.__turn.get_number(),
-    #         "move_counter": self.__move_counter,
-    #         "history": converted_history,
-    #         "player_1": player_1,
-    #         "player_2": player_2,
-    #         "mill": self.__mill
-    #     }
-    #
-    #     # write data into json-file
-    #     with open(filename, 'w') as f:
-    #         json.dump(data, f, indent=4)
-    #
-    #     self.logger.info("saved data in {}".format(filename))
 
 
 class MoveException(Exception):
