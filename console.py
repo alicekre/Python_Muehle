@@ -17,7 +17,8 @@ fh_2 = logging.FileHandler('info.log')
 fh_1.setLevel(logging.DEBUG)
 fh_2.setLevel(logging.INFO)
 # create formatters and add it to the handlers
-formatter_1 = logging.Formatter('%(asctime)s - %(name)25s : %(funcName)30s, ln %(lineno)4s - %(levelname)8s - %(message)s')
+formatter_1 = logging.Formatter('%(asctime)s - %(name)25s : %(funcName)30s, ln %(lineno)4s - %(levelname)8s - '
+                                '%(message)s')
 formatter_2 = logging.Formatter('%(asctime)s - %(name)25s : %(levelname)8s - %(message)s')
 fh_1.setFormatter(formatter_1)
 fh_2.setFormatter(formatter_2)
@@ -48,11 +49,12 @@ def read_node(msg):
 
 def main():
     logger.info("start new game")
-    print("Do you want to load a saved Game? (y/n):", end="")
-    if input() == "y":
-        Game(input("Enter path to file: "))
-    else:
-        game = Game()
+    # print("Do you want to load a saved Game? (y/n):", end="")
+    # if input() == "y":
+    #     game = Game(input("Enter path to file: "))
+    # else:
+    #     game = Game()
+    game = Game()
     try:
         while True:
             print("Player {} in turn.".format(game.get_turn()))
@@ -86,10 +88,10 @@ def main():
         quit()
 
     except KeyboardInterrupt:
-        print("Do you want to save the game? (y/n):", end="")
-        if input() == "y":
-            game.store()
-            quit()
+        # print("Do you want to save the game? (y/n):", end="")
+        # if input() == "y":
+        #     game.store()
+        #     quit()
         print("Quit without saving? (y/n):", end="")
         if input() == "y":
             quit()

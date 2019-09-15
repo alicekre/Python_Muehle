@@ -27,12 +27,12 @@ class _Field:
         __field (dict): The graph (play board).
     """
 
-    def __init__(self, field=None):
+    def __init__(self, states=None):
         """
         The constructor for _Field class
 
-        :param field: the field with states
-        :type field: dict
+        :param states: the field with states
+        :type states: dict
         """
         self.__field = {(1, 1, 1): [frozenset({(1, 2, 1), (1, 1, 2)}), 0],
                         (1, 1, 2): [frozenset({(1, 1, 1), (1, 1, 3), (2, 1, 2)}), 0],
@@ -60,9 +60,9 @@ class _Field:
                         (3, 3, 3): [frozenset({(3, 3, 2), (3, 2, 3)}), 0]
                         }
 
-        if field is not None:
+        if states is not None:
             for node in self.__field:
-                self.set_node_state(node, field[node])
+                self.set_node_state(node, states[node])
 
     def get_nodes(self):
         """
@@ -428,7 +428,91 @@ class _PlayerException(Exception):
         """The constructor for the PlayerException class"""
         pass
 
-# TODO make separate Storage class
+
+class History:
+    """
+    The History class
+
+    Attributes:
+        __fields (list): list of Field with fields in history
+        __move_counter (int): number of moves since last mill
+        __fields_counter (dict): hashtable to count equal field states
+    """
+
+    def __init__(self, fields=None, move_counter=0):
+        """
+        The constructor for History class
+
+        :param fields: the list of fields
+        :type fields: list of Field
+        :param move_counter: counter of moves since last mill
+        :type move_counter: int
+        """
+        if fields is None:
+            self.__fields = []
+            self.__fields_counter = {}
+        else:
+            self.__fields = fields
+
+            # built fields_counter with fields
+            for field in self.__fields:
+                # It is enough to compare states of fields
+                field = field.get_states()
+                # dict is not hashable so do workaround
+                hashable = frozenset(field.items())
+                if hashable in self.__fields_counter:
+                    self.__fields_counter[hashable] += 1
+                else:
+                    self.__fields_counter[hashable] = 1
+
+        self.__move_counter = move_counter
+
+    def get_move_counter(self):
+        """
+        returns the value of move_counter
+
+        :return: move_counter
+        :rtype: int
+        """
+        return self.__move_counter
+
+    def add(self, field):
+        """
+        adds a field to history
+
+        :param field: the field to add in history
+        :type field: _Field
+        """
+        # add field in history
+        self.__fields.append(field)
+
+        # compare just the states
+        field = field.get_states()
+
+        # add field to counting hashtable
+        # dict in not hashable so do workaround
+        hashable = frozenset(field.items())
+        if hashable in self.__fields_counter:
+            self.__fields_counter[hashable] += 1
+        else:
+            self.__fields_counter[hashable] = 1
+
+    def increase_move_counter(self):
+        """increases move_counter"""
+        self.__move_counter += self.__move_counter + 1
+
+    def decrease_move_counter(self):
+        """decreases move_counter to 0"""
+        self.__move_counter = 0
+
+    def get_highest_fields_counter(self):
+        """
+        returns highest value in fields_counter
+
+        :return: highest value in fields_counter
+        :rtype: int
+        """
+        return max(self.__fields_counter)
 
 
 class Game:
@@ -440,63 +524,37 @@ class Game:
         __player_2 (Player): The second player
         __field (Field): The play board
         __turn (Player): The player who is in turn
-        __move_counter (int): counts the moves between two mills
-        __history (list): list of dict with nodes and states
-        __history_counter (dict): hashtable to count equal items in __history
+        __history (History): history of field
         __mill (bool): indicates if there is a mill and no chip was removed
     """
 
-    def __init__(self, filename=None):
+    def __init__(self, player_1=_Player(1), player_2=_Player(2), field=_Field(), turn=None, history=History(),
+                 mill=False):
         """
-        The constructor for Game class
 
-        :param filename: path to file
-        :type filename: str
+
+        :param player_1:
+        :param player_2:
+        :param field:
+        :param turn:
+        :param history:
+        :param mill:
         """
         # logger for Game class
         self.logger = logging.getLogger('application.mill.Game')
 
-        # load stored data
-        if filename is not None:
-            # convert fields from json to dict
-            data = Game.__convert_from_json(filename)
+        self.__player_1 = player_1
+        self.__player_2 = player_2
+        self.__field = field
 
-            # initialize attributes with stored data
-            self.__player_1 = _Player(1, data["player_1"]["number_chips"], data["player_1"]["phase"])
-            self.__player_2 = _Player(2, data["player_2"]["number_chips"], data["player_2"]["phase"])
-            self.__field = _Field(data["field"])
-
-            if data["turn"] == 1:
-                self.__turn = self.__player_1
-            elif data["turn"] == 2:
-                self.__turn = self.__player_2
-
-            self.__move_counter = data["move_counter"]
-            self.__history = data["history"]
-
-            # initialize history_counter with stored history
-            for field in self.__history:
-                # dict is not hashable so do workaround
-                hashable = frozenset(field.items())
-                if hashable in self.__history_counter:
-                    self.__history_counter[hashable] += 1
-                else:
-                    self.__history_counter[hashable] = 1
-
-            self.__mill = data["mill"]
-            self.logger.debug("New Game instance created from file")
-
-        else:
-            # no stored data
-            self.__player_1 = _Player(1)
-            self.__player_2 = _Player(2)
-            self.__field = _Field()
+        if turn is None:
             self.__turn = self.__player_1
-            self.__move_counter = 0
-            self.__history = []
-            self.__history_counter = {}
-            self.__mill = False
-            self.logger.debug("New Game instance created")
+        else:
+            self.__turn = turn
+
+        self.__history = history
+        self.__mill = mill
+        self.logger.debug("New Game instance created")
 
     @staticmethod
     def __convert_from_json(filename):
@@ -522,21 +580,6 @@ class Game:
         content["history"] = converted_history
 
         return content
-
-    def __add_to_history(self):
-        """adds current field to history"""
-        field = self.get_field()
-
-        # add field in history
-        self.__history.append(field)
-
-        # add field to counting hashtable
-        # dict in not hashable so do workaround
-        hashable = frozenset(field.items())
-        if hashable in self.__history_counter:
-            self.__history_counter[hashable] += 1
-        else:
-            self.__history_counter[hashable] = 1
 
     def __change_turn(self):
         """
@@ -581,9 +624,8 @@ class Game:
         :return: True if current field is not more than 2 times in history
         :rtype: bool
         """
-        for field in self.__history_counter:
-            if self.__history_counter[field] >= 3:
-                return False
+        if self.__history.get_highest_fields_counter() >= 3:
+            return False
         return True
 
     def __change_to_phase_2(self):
@@ -751,7 +793,7 @@ class Game:
 
         # check on remis
         # 50 moves without mill
-        elif self.__move_counter >= 50:
+        elif self.__history.get_move_counter() >= 50:
             self.logger.debug("raise RemisException: 50 moves no mill")
             raise RemisException(1)
 
@@ -843,7 +885,7 @@ class Game:
             self.__field.print_playboard()
             self.__mill = False
             # decrease move_counter to 0
-            self.__move_counter = 0
+            self.__history.decrease_move_counter()
             self.__check_on_win_and_remis()
             self.__change_to_phase_3()
             self.__change_turn()
@@ -893,47 +935,47 @@ class Game:
             # if there is no mill finish move
             if not self.__mill:
                 self.__field.print_playboard()
-                self.__move_counter += 1
-                self.__add_to_history()
+                self.__history.increase_move_counter()
+                self.__history.add(self.__field)
                 if self.__turn.phase in (2, 3):
                     self.__check_on_win_and_remis()
                 self.__change_turn()
 
-    def store(self, filename="savedGames/{}-mill.json".format(time.time())):
-        """
-        saves the game in a json file
-        :param filename: the file name to save the data
-        :type filename: str
-        """
-        # convert field in history into json compatible structure, make keys to strings
-        converted_history = []
-        for field in self.__history:
-            converted_field = _Field.convert_field_into_json(field)
-            converted_history.append(converted_field)
-        player_1 = {
-            "number_chips": self.__player_1.get_number_chips(),
-            "phase": self.__player_1.phase
-        }
-        player_2 = {
-            "number_chips": self.__player_2.get_number_chips(),
-            "phase": self.__player_2.phase
-        }
-
-        data = {
-            "field": _Field.convert_field_into_json(self.get_field()),
-            "turn": self.__turn.get_number(),
-            "move_counter": self.__move_counter,
-            "history": converted_history,
-            "player_1": player_1,
-            "player_2": player_2,
-            "mill": self.__mill
-        }
-
-        # write data into json-file
-        with open(filename, 'w') as f:
-            json.dump(data, f, indent=4)
-
-        self.logger.info("saved data in {}".format(filename))
+    # def store(self, filename="savedGames/{}-mill.json".format(time.time())):
+    #     """
+    #     saves the game in a json file
+    #     :param filename: the file name to save the data
+    #     :type filename: str
+    #     """
+    #     # convert field in history into json compatible structure, make keys to strings
+    #     converted_history = []
+    #     for field in self.__history:
+    #         converted_field = _Field.convert_field_into_json(field)
+    #         converted_history.append(converted_field)
+    #     player_1 = {
+    #         "number_chips": self.__player_1.get_number_chips(),
+    #         "phase": self.__player_1.phase
+    #     }
+    #     player_2 = {
+    #         "number_chips": self.__player_2.get_number_chips(),
+    #         "phase": self.__player_2.phase
+    #     }
+    #
+    #     data = {
+    #         "field": _Field.convert_field_into_json(self.get_field()),
+    #         "turn": self.__turn.get_number(),
+    #         "move_counter": self.__move_counter,
+    #         "history": converted_history,
+    #         "player_1": player_1,
+    #         "player_2": player_2,
+    #         "mill": self.__mill
+    #     }
+    #
+    #     # write data into json-file
+    #     with open(filename, 'w') as f:
+    #         json.dump(data, f, indent=4)
+    #
+    #     self.logger.info("saved data in {}".format(filename))
 
 
 class MoveException(Exception):
