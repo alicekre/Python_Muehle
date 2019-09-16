@@ -1,15 +1,19 @@
 import mill
 import time
 import json
+import logging
+
+# create logger for module
+module_log = logging.getLogger('application.storage')
 
 
-# TODO add logging
 class Storage:
     """
 
     """
 
     def __init__(self, filename):
+        self.logger = logging.getLogger('application.storage.Storage')
         self.filename = filename
 
 
@@ -23,10 +27,16 @@ class Loader(Storage):
         with open(self.filename, 'r') as f:
             self.__content = json.load(f)
 
+        self.__convert_from_json()
+        self.logger.debug("created Loader instance")
+
     def reload_file(self):
         """reloads the content of the file"""
         with open(self.filename, 'r') as f:
             self.__content = json.load(f)
+
+        self.__convert_from_json()
+        self.logger.debug("{} reloaded".format(self.filename))
 
     def load_game(self):
         """
@@ -48,6 +58,7 @@ class Loader(Storage):
         history = self.__build_history()
         mill_bool = self.__content["mill"]
 
+        self.logger.debug("create Game instance from file {}".format(self.filename))
         return mill.Game(player_1, player_2, field, turn, history, mill_bool)
 
     def __build_player(self, number):
@@ -110,6 +121,8 @@ class Saver(Storage):
         else:
             raise TypeError
 
+        self.logger.debug("created Saver instance")
+
     def save(self):
         """
 
@@ -120,6 +133,8 @@ class Saver(Storage):
         # write data into json-file
         with open(self.filename, 'w') as f:
             json.dump(data, f, indent=4)
+
+        self.logger.debug("save file into {}".format(self.filename))
 
     def __convert_into_json(self):
         """
