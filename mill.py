@@ -1,5 +1,5 @@
 #
-#
+# @author Christian Birker
 #
 # Logic of board game mill
 #
@@ -343,9 +343,10 @@ class Field:
 
     def get_converted_json(self):
         """
+        returns the states of the field in a json-able dict
 
-
-        :return:
+        :return: states of the field in a json-able dict
+        :rtype: dict
         """
         field_converted = {}
         for node in self.__field:
@@ -355,7 +356,7 @@ class Field:
     @staticmethod
     def convert_field_from_json(field):
         """
-        converts a field in json format into a dict (keys are tuples)
+        converts a dict of states of the field in json format into a dict (keys are tuples)
 
         :param field: field in json format
         :return: field
@@ -462,7 +463,11 @@ class History:
         self.__move_counter = move_counter
 
     def get_fields(self):
-        """"""
+        """
+        returns the fields in the history
+        :return: fields
+        :rtype: list of Field
+        """
         return self.__fields
 
     def get_move_counter(self):
@@ -529,14 +534,20 @@ class Game:
     def __init__(self, player_1=Player(1), player_2=Player(2), field=Field(), turn=None, history=History(),
                  mill=False):
         """
+        constructor for Game class
 
-
-        :param player_1:
-        :param player_2:
-        :param field:
-        :param turn:
-        :param history:
-        :param mill:
+        :param player_1: the first player
+        :type player_1: Player
+        :param player_2: the second player
+        :type player_2: Player
+        :param field: the playboard
+        :type field: Field
+        :param turn: the player in turn
+        :type turn: Player
+        :param history: the history of the game
+        :type history: History
+        :param mill: True if a mill exists and no chip was removed
+        :type mill: bool
         """
         # logger for Game class
         self.logger = logging.getLogger('application.mill.Game')
@@ -805,15 +816,21 @@ class Game:
 
     def get_history(self):
         """
+        returns the history
 
-        :return:
+        :return: the history
+        :rtype: History
         """
+
         return self.__history
 
     def get_field_instance(self):
         """
+        returns the field as Field instance
 
-        :return:
+        :return: the field as Field instance
+        :rtype: Field
+
         """
         return self.__field
 
@@ -838,15 +855,33 @@ class Game:
         return self.__field.get_states()
 
     def get_player_1(self):
-        """"""
+        """
+        returns the first player
+
+        :return: the first player
+        :rtype: Player
+        """
+
         return self.__player_1
 
     def get_player_2(self):
-        """"""
+        """
+        returns the second player
+
+        :return: the second player
+        :rtype: Player
+        """
+
         return self.__player_2
 
     def get_mill(self):
-        """"""
+        """
+        returns the state of mill
+
+        :return: the state of mill
+        :rtype: bool
+        """
+
         return self.__mill
 
     def remove_chip(self, node):

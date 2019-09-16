@@ -1,3 +1,10 @@
+#
+# @author Christian Birker
+#
+# storage module for the board game mill
+# saves and loads games
+#
+
 import mill
 import time
 import json
@@ -9,19 +16,27 @@ module_log = logging.getLogger('application.storage')
 
 class Storage:
     """
+    The Storage class
 
+    Attributes:
+        filename (str): the path to the file
     """
 
     def __init__(self, filename):
+        """the constructor for Storage class"""
         self.logger = logging.getLogger('application.storage.Storage')
         self.filename = filename
 
 
 class Loader(Storage):
     """
+    The Loader class represents loading a game from a file
 
+    Attributes:
+        __content (dict): the converted file content
     """
     def __init__(self, filename):
+        """the constructor for Loader class"""
         super().__init__(filename)
 
         with open(self.filename, 'r') as f:
@@ -31,7 +46,7 @@ class Loader(Storage):
         self.logger.debug("created Loader instance")
 
     def reload_file(self):
-        """reloads the content of the file"""
+        """reloads the content from the file"""
         with open(self.filename, 'r') as f:
             self.__content = json.load(f)
 
@@ -40,9 +55,10 @@ class Loader(Storage):
 
     def load_game(self):
         """
+        builds and returns a Game instance of the file content
 
-
-        :return:
+        :return: the initialized game as instance of Game class
+        :rtype: Game
         """
         player_1 = self.__build_player(1)
         player_2 = self.__build_player(2)
@@ -62,7 +78,14 @@ class Loader(Storage):
         return mill.Game(player_1, player_2, field, turn, history, mill_bool)
 
     def __build_player(self, number):
-        """"""
+        """
+        builds a Player instance of file content
+
+        :param number: the number of the player (1, 2)
+        :return: player as instance of Player
+        :rtype: Player
+        :raise: ValueError if number is not 1 or 2
+        """
         if number == 1:
             number_chips = self.__content["player_1"]["number_chips"]
             phase = self.__content["player_1"]["phase"]
@@ -77,6 +100,12 @@ class Loader(Storage):
         return player
 
     def __build_history(self):
+        """
+        builds and returns a History instance from the content of the file
+
+        :return: the stored history as History instance
+        :rtype: History
+        """
         move_counter = self.__content["move_counter"]
 
         history = self.__content["history"]
@@ -88,11 +117,7 @@ class Loader(Storage):
         return mill.History(fields, move_counter)
 
     def __convert_from_json(self):
-        """
-
-
-        :return:
-        """
+        """converts the content from file into dct"""
         # convert field
         self.__content["field"] = mill.Field.convert_field_from_json(self.__content["field"])
 
@@ -103,18 +128,29 @@ class Loader(Storage):
 
         self.__content["history"] = converted_history
 
-    # DEBUG
     def print_content(self):
+        # DEBUG
         print(self.__content)
 
 
 class Saver(Storage):
     """
+    The Saver class represents saving a game into a file
 
+    Attributes:
+        game (Game): the game to save
     """
 
     def __init__(self, game, filename="savedGames/{}-mill.json".format(time.time)):
-        """"""
+        """
+        constructor for Saver class
+
+        :param game: the game to save
+        :type game: Game
+        :param filename: the path of the file
+        :type filename: str
+        :raise: TypeError if game is not an instance of Game
+        """
         super().__init__(filename)
         if isinstance(game, mill.Game):
             self.game = game
@@ -124,11 +160,7 @@ class Saver(Storage):
         self.logger.debug("created Saver instance")
 
     def save(self):
-        """
-
-
-        :return:
-        """
+        """saves the file"""
         data = self.__convert_into_json()
         # write data into json-file
         with open(self.filename, 'w') as f:
@@ -138,9 +170,10 @@ class Saver(Storage):
 
     def __convert_into_json(self):
         """
+        converts the game (Game) into json format
 
-
-        :return:
+        :return: the converted game
+        :rtype: dict
         """
 
         # convert field in history into json compatible structure, make keys to strings
