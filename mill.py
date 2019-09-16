@@ -5,8 +5,6 @@
 #
 
 import logging
-import json
-import time
 from prettytable import PrettyTable  # just used for printing the play board formatted.
 from ast import literal_eval as make_tuple
 
@@ -555,32 +553,6 @@ class Game:
         self.__history = history
         self.__mill = mill
         self.logger.debug("New Game instance created")
-
-    # TODO delete method
-    @staticmethod
-    def __convert_from_json(filename):
-        """
-        converts json file into dict
-
-        :param filename: filename of the json file
-        :type filename: str
-        :return: a dict with all the data
-        :rtype: dict
-        """
-        # open json-file
-        with open(filename, 'r') as f:
-            content = json.load(f)
-
-        # convert field
-        content["field"] = Field.convert_field_from_json(content["field"])
-
-        # convert history
-        converted_history = []
-        for field in content["history"]:
-            converted_history.append(Field.convert_field_from_json(field))
-        content["history"] = converted_history
-
-        return content
 
     def __change_turn(self):
         """

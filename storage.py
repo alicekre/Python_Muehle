@@ -3,10 +3,6 @@ import time
 import json
 
 
-def convert_field_from_json(field):
-    pass
-
-
 # TODO add logging
 class Storage:
     """
@@ -38,19 +34,47 @@ class Loader(Storage):
 
         :return:
         """
-        # open json-file
+        player_1 = self.__build_player(1)
+        player_2 = self.__build_player(2)
+        field = mill.Field(self.__content["field"])
 
+        if self.__content["turn"] == 1:
+            turn = player_1
+        elif self.__content["turn"] == 2:
+            turn = player_2
+        else:
+            raise ValueError
 
-        # convert field
-        self.__content["field"] = mill.Field.convert_field_from_json(self.__content["field"])
+        history = self.__build_history()
+        mill_bool = self.__content["mill"]
 
-        # convert history
-        converted_history = []
-        for field in self.__content["history"]:
-            converted_history.append(mill.Field.convert_field_from_json(field))
-        self.__content["history"] = converted_history
+        return mill.Game(player_1, player_2, field, turn, history, mill_bool)
 
-        return self.__content
+    def __build_player(self, number):
+        """"""
+        if number == 1:
+            number_chips = self.__content["player_1"]["number_chips"]
+            phase = self.__content["player_1"]["phase"]
+            player = mill.Player(number, number_chips, phase)
+        elif number == 2:
+            number_chips = self.__content["player_2"]["number_chips"]
+            phase = self.__content["player_2"]["phase"]
+            player = mill.Player(number, number_chips, phase)
+        else:
+            raise ValueError
+
+        return player
+
+    def __build_history(self):
+        move_counter = self.__content["move_counter"]
+
+        history = self.__content["history"]
+        fields = []
+        for field in history:
+            field_instance = mill.Field(field)
+            fields.append(field_instance)
+
+        return mill.History(fields, move_counter)
 
     def __convert_from_json(self):
         """
@@ -58,7 +82,19 @@ class Loader(Storage):
 
         :return:
         """
-        pass
+        # convert field
+        self.__content["field"] = mill.Field.convert_field_from_json(self.__content["field"])
+
+        # convert history
+        converted_history = []
+        for field in self.__content["history"]:
+            converted_history.append(mill.Field.convert_field_from_json(field))
+
+        self.__content["history"] = converted_history
+
+    # DEBUG
+    def print_content(self):
+        print(self.__content)
 
 
 class Saver(Storage):
@@ -69,7 +105,7 @@ class Saver(Storage):
     def __init__(self, game, filename="savedGames/{}-mill.json".format(time.time)):
         """"""
         super().__init__(filename)
-        if game is isinstance(mill.Game):
+        if isinstance(game, mill.Game):
             self.game = game
         else:
             raise TypeError
