@@ -1,4 +1,5 @@
 #
+# @author Christian Birker
 #
 # console playable mill board game
 #
@@ -100,6 +101,7 @@ def main():
         if input() == "y":
             saver = storage.Saver(game)
             saver.save()
+            quit()
         print("Quit without saving? (y/n):", end="")
         if input() == "y":
             quit()
