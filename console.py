@@ -6,6 +6,7 @@
 
 import logging
 from mill import *
+import storage
 from ast import literal_eval as make_tuple
 
 # create logger
@@ -49,12 +50,14 @@ def read_node(msg):
 
 def main():
     logger.info("start new game")
-    # print("Do you want to load a saved Game? (y/n):", end="")
-    # if input() == "y":
-    #     game = Game(input("Enter path to file: "))
-    # else:
-    #     game = Game()
-    game = Game()
+    print("Do you want to load a saved Game? (y/n):", end="")
+    if input() == "y":
+        filename = input("Enter path to file: ")
+        loader = storage.Loader(filename)
+        game = loader.load_game()
+    else:
+        game = Game()
+
     try:
         while True:
             print("Player {} in turn.".format(game.get_turn()))
@@ -88,10 +91,10 @@ def main():
         quit()
 
     except KeyboardInterrupt:
-        # print("Do you want to save the game? (y/n):", end="")
-        # if input() == "y":
-        #     game.store()
-        #     quit()
+        print("Do you want to save the game? (y/n):", end="")
+        if input() == "y":
+            saver = storage.Saver(game)
+            saver.save()
         print("Quit without saving? (y/n):", end="")
         if input() == "y":
             quit()
