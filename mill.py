@@ -515,7 +515,7 @@ class History:
         :return: highest value in fields_counter
         :rtype: int
         """
-        return max(self.__fields_counter)
+        return max(self.__fields_counter.values())
 
 
 class Game:
@@ -920,7 +920,8 @@ class Game:
             self.__mill = False
             # decrease move_counter to 0
             self.__history.decrease_move_counter()
-            self.__check_on_win_and_remis()
+            if self.__turn.phase in (2, 3):
+                self.__check_on_win_and_remis()
             self.__change_to_phase_3()
             self.__change_turn()
 

@@ -73,6 +73,11 @@ def main():
                             break
                         except MoveException:
                             print("Choose valid chip to remove.")
+
+                # DEBUG
+                saver = storage.Saver(game)
+                saver.save()
+
             except ValueError:
                 print("Invalid node. Try again: ")
             except MoveException:
