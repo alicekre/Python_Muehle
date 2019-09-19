@@ -504,7 +504,7 @@ class History:
 
     def increase_move_counter(self):
         """increases move_counter"""
-        self.__move_counter += self.__move_counter + 1
+        self.__move_counter += 1
 
     def decrease_move_counter(self):
         """decreases move_counter to 0"""

@@ -76,8 +76,8 @@ def main():
                             print("Choose valid chip to remove.")
 
                 # DEBUG
-                #saver = storage.Saver(game)
-                #saver.save()
+                saver = storage.Saver(game)
+                saver.save()
 
             except ValueError:
                 print("Invalid node. Try again: ")
