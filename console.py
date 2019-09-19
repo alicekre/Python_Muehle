@@ -6,6 +6,7 @@
 
 
 import logging
+import time
 from mill import *
 import storage
 from ast import literal_eval as make_tuple
@@ -76,7 +77,7 @@ def main():
                             print("Choose valid chip to remove.")
 
                 # DEBUG
-                saver = storage.Saver(game)
+                saver = storage.Saver(game, "savedGames/{}-mill.json".format(time.time()))
                 saver.save()
 
             except ValueError:

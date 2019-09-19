@@ -488,6 +488,7 @@ class History:
         :param field: the field to add in history
         :type field: Field
         """
+        field = Field(field.get_states())
         # add field in history
         self.__fields.append(field)
 
