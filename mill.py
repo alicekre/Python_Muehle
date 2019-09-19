@@ -449,6 +449,7 @@ class History:
             self.__fields_counter = {}
         else:
             self.__fields = fields
+            self.__fields_counter = {}
 
             # built fields_counter with fields
             for field in self.__fields:
