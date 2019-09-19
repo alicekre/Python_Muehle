@@ -19,9 +19,9 @@ fh_2 = logging.FileHandler('info.log')
 fh_1.setLevel(logging.DEBUG)
 fh_2.setLevel(logging.INFO)
 # create formatters and add it to the handlers
-formatter_1 = logging.Formatter('%(asctime)s - %(name)25s : %(funcName)30s, ln %(lineno)4s - %(levelname)8s - '
+formatter_1 = logging.Formatter('%(asctime)s - %(name)30s : %(funcName)30s, ln %(lineno)4s - %(levelname)8s - '
                                 '%(message)s')
-formatter_2 = logging.Formatter('%(asctime)s - %(name)25s : %(levelname)8s - %(message)s')
+formatter_2 = logging.Formatter('%(asctime)s - %(name)30s : %(levelname)8s - %(message)s')
 fh_1.setFormatter(formatter_1)
 fh_2.setFormatter(formatter_2)
 
@@ -76,8 +76,8 @@ def main():
                             print("Choose valid chip to remove.")
 
                 # DEBUG
-                saver = storage.Saver(game)
-                saver.save()
+                #saver = storage.Saver(game)
+                #saver.save()
 
             except ValueError:
                 print("Invalid node. Try again: ")

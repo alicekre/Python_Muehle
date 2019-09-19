@@ -141,7 +141,7 @@ class Saver(Storage):
         game (Game): the game to save
     """
 
-    def __init__(self, game, filename="savedGames/{}-mill.json".format(time.time)):
+    def __init__(self, game, filename="savedGames/{}-mill.json".format(time.time())):
         """
         constructor for Saver class
 

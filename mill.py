@@ -350,7 +350,8 @@ class Field:
         """
         field_converted = {}
         for node in self.__field:
-            field_converted[str(node)] = self.__field[node]
+            field_converted[str(node)] = self.get_state(node)
+
         return field_converted
 
     @staticmethod
