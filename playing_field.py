@@ -104,13 +104,13 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             self.window3.initUI("Zug nicht erlaubt. \n Probier's nochmal!" 
                               , "Unerlaubter Zug")
             
-            if self.game.get_turn()==1:
-                getattr(self, "label_{}".format(self.start_label)).setPixmap(QtGui.QPixmap("blau.png"))
-            if self.game.get_turn()==2:
-                getattr(self, "label_{}".format(self.start_label)).setPixmap(QtGui.QPixmap("gelb.png"))
-            getattr(self, "label_{}".format(self.end_label)).clear()
-            self.label_121.clear()
-                                    
+#            if self.game.get_turn()==1:
+#                getattr(self, "label_{}".format(self.start_label)).setPixmap(QtGui.QPixmap("blau.png"))
+#            if self.game.get_turn()==2:
+#                getattr(self, "label_{}".format(self.start_label)).setPixmap(QtGui.QPixmap("gelb.png"))
+#            getattr(self, "label_{}".format(self.end_label)).clear()
+#            self.label_121.clear()
+#                                    
         except WinException as e:
             print("Player {} wins, player {} looses".format(e.number_winner, e.number_looser))
             self.won_ui(e.number_winner, e.number_looser,1)
