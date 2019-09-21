@@ -1,13 +1,18 @@
 #
-#
+# @author Christian Birker
 #
 # Logic of board game mill
 #
 
+import logging
 from prettytable import PrettyTable  # just used for printing the play board formatted.
+from ast import literal_eval as make_tuple
+
+# create logger for module
+module_log = logging.getLogger('application.mill')
 
 
-class _Field:
+class Field:
     """
     This class represents the play board as undirected graph.
 
@@ -17,11 +22,16 @@ class _Field:
     State = 0: no chip, state = 1: chip of player_1, state = 2: chip of player_2.
 
     Attributes:
-        __field (dictionary): The graph (play board).
+        __field (dict): The graph (play board).
     """
 
-    def __init__(self):
-        """The constructor for _Field class"""
+    def __init__(self, states=None):
+        """
+        The constructor for _Field class
+
+        :param states: the field with states
+        :type states: dict
+        """
         self.__field = {(1, 1, 1): [frozenset({(1, 2, 1), (1, 1, 2)}), 0],
                         (1, 1, 2): [frozenset({(1, 1, 1), (1, 1, 3), (2, 1, 2)}), 0],
                         (1, 1, 3): [frozenset({(1, 1, 2), (1, 2, 3)}), 0],
@@ -47,6 +57,10 @@ class _Field:
                         (3, 3, 2): [frozenset({(3, 3, 1), (3, 3, 3), (2, 3, 2)}), 0],
                         (3, 3, 3): [frozenset({(3, 3, 2), (3, 2, 3)}), 0]
                         }
+
+        if states is not None:
+            for node in self.__field:
+                self.set_node_state(node, states[node])
 
     def get_nodes(self):
         """
@@ -327,8 +341,35 @@ class _Field:
                 return True
         return False
 
+    def get_converted_json(self):
+        """
+        returns the states of the field in a json-able dict
 
-class _Player:
+        :return: states of the field in a json-able dict
+        :rtype: dict
+        """
+        field_converted = {}
+        for node in self.__field:
+            field_converted[str(node)] = self.get_state(node)
+
+        return field_converted
+
+    @staticmethod
+    def convert_field_from_json(field):
+        """
+        converts a dict of states of the field in json format into a dict (keys are tuples)
+
+        :param field: field in json format
+        :return: field
+        :rtype: dict
+        """
+        field_converted = {}
+        for node in field:
+            field_converted[make_tuple(node)] = field[node]
+        return field_converted
+
+
+class Player:
     """
     The class Player represents a player in the game
 
@@ -340,11 +381,29 @@ class _Player:
 
     def __init__(self, number, number_chips=9, phase=1):
         """The constructor for Player class"""
-        if number not in (1, 2):
+        if number not in (1, 2) or number_chips not in range(0, 10) or phase not in (1, 2, 3):
             raise ValueError
-        self.number = number
-        self.number_chips = number_chips
+        self.__number = number
+        self.__number_chips = number_chips
         self.phase = phase
+
+    def get_number(self):
+        """
+        returns the number of the player
+
+        :return: number of player
+        :rtype: int
+        """
+        return self.__number
+
+    def get_number_chips(self):
+        """
+        returns number of chips which are left to set
+
+        :return: number of chips
+        :rtype: int
+        """
+        return self.__number_chips
 
     def put_chip(self):
         """
@@ -353,17 +412,113 @@ class _Player:
         :raise: PlayerException if player has less than 1 chip
         """
 
-        if self.number_chips <= 0:
-            raise _PlayerException
+        if self.__number_chips <= 0:
+            raise PlayerException
         else:
-            self.number_chips -= 1
+            self.__number_chips -= 1
 
 
-class _PlayerException(Exception):
+class PlayerException(Exception):
     """The class PlayerException is a Exception class for the class Player"""
     def __init__(self):
         """The constructor for the PlayerException class"""
         pass
+
+
+class History:
+    """
+    The History class
+
+    Attributes:
+        __fields (list): list of Field with fields in history
+        __move_counter (int): number of moves since last mill
+        __fields_counter (dict): hashtable to count equal field states
+    """
+
+    def __init__(self, fields=None, move_counter=0):
+        """
+        The constructor for History class
+
+        :param fields: the list of fields
+        :type fields: list of Field
+        :param move_counter: counter of moves since last mill
+        :type move_counter: int
+        """
+        if fields is None:
+            self.__fields = []
+            self.__fields_counter = {}
+        else:
+            self.__fields = fields
+            self.__fields_counter = {}
+
+            # built fields_counter with fields
+            for field in self.__fields:
+                # It is enough to compare states of fields
+                field = field.get_states()
+                # dict is not hashable so do workaround
+                hashable = frozenset(field.items())
+                if hashable in self.__fields_counter:
+                    self.__fields_counter[hashable] += 1
+                else:
+                    self.__fields_counter[hashable] = 1
+
+        self.__move_counter = move_counter
+
+    def get_fields(self):
+        """
+        returns the fields in the history
+        :return: fields
+        :rtype: list of Field
+        """
+        return self.__fields
+
+    def get_move_counter(self):
+        """
+        returns the value of move_counter
+
+        :return: move_counter
+        :rtype: int
+        """
+        return self.__move_counter
+
+    def add(self, field):
+        """
+        adds a field to history
+
+        :param field: the field to add in history
+        :type field: Field
+        """
+        field = Field(field.get_states())
+        # add field in history
+        self.__fields.append(field)
+
+        # compare just the states
+        field = field.get_states()
+
+        # add field to counting hashtable
+        # dict in not hashable so do workaround
+        hashable = frozenset(field.items())
+        if hashable in self.__fields_counter:
+            self.__fields_counter[hashable] += 1
+        else:
+            self.__fields_counter[hashable] = 1
+
+    def increase_move_counter(self):
+        """increases move_counter"""
+        self.__move_counter += 1
+
+    def decrease_move_counter(self):
+        """decreases move_counter to 0"""
+        self.__move_counter = 0
+
+    def get_highest_fields_counter(self):
+        """
+        returns highest value in fields_counter
+
+        :return: highest value in fields_counter
+        :rtype: int
+        """
+        return max(self.__fields_counter.values())
 
 
 class Game:
@@ -375,20 +530,43 @@ class Game:
         __player_2 (Player): The second player
         __field (Field): The play board
         __turn (Player): The player who is in turn
-        __move_counter (int): counts the moves between two mills
-        __history (list): list of dict with nodes and states
+        __history (History): history of field
         __mill (bool): indicates if there is a mill and no chip was removed
     """
 
-    def __init__(self):
-        """The constructor for Game class"""
-        self.__player_1 = _Player(1)
-        self.__player_2 = _Player(2)
-        self.__field = _Field()
-        self.__turn = self.__player_1
-        self.__move_counter = 0
-        self.__history = []
-        self.__mill = False
+    def __init__(self, player_1=Player(1), player_2=Player(2), field=Field(), turn=None, history=History(),
+                 mill=False):
+        """
+        constructor for Game class
+
+        :param player_1: the first player
+        :type player_1: Player
+        :param player_2: the second player
+        :type player_2: Player
+        :param field: the playboard
+        :type field: Field
+        :param turn: the player in turn
+        :type turn: Player
+        :param history: the history of the game
+        :type history: History
+        :param mill: True if a mill exists and no chip was removed
+        :type mill: bool
+        """
+        # logger for Game class
+        self.logger = logging.getLogger('application.mill.Game')
+
+        self.__player_1 = player_1
+        self.__player_2 = player_2
+        self.__field = field
+
+        if turn is None:
+            self.__turn = self.__player_1
+        else:
+            self.__turn = turn
+
+        self.__history = history
+        self.__mill = mill
+        self.logger.debug("New Game instance created")
 
     def __change_turn(self):
         """
@@ -399,11 +577,14 @@ class Game:
 
         if self.__turn is self.__player_1:
             self.__turn = self.__player_2
+            self.logger.info("changed turn to 2")
             print("Changed player in turn to player 2")
         elif self.__turn is self.__player_2:
             self.__turn = self.__player_1
+            self.logger.info("changed turn to 1")
             print("Changed player in turn to player 1")
         else:
+            self.logger.error("raise ValueError")
             raise ValueError
 
     def __get_opponent(self):
@@ -411,7 +592,7 @@ class Game:
         returns the player who is not in turn
 
         :return: the player who is not in turn
-        :rtype: _Player
+        :rtype: Player
         :raise: ValueError if Player is not player_1 or player_2
         """
 
@@ -420,6 +601,7 @@ class Game:
         elif self.__turn is self.__player_2:
             return self.__player_1
         else:
+            self.logger.error("raise ValueError")
             raise ValueError
 
     def __check_history(self):
@@ -429,32 +611,25 @@ class Game:
         :return: True if current field is not more than 2 times in history
         :rtype: bool
         """
-
-        duplicates = {}
-        for field in self.__history:
-            # dict is unhashable so do workaround
-            hashable = frozenset(field.items())
-            if hashable in duplicates:
-                duplicates[hashable] += 1
-                if duplicates[hashable] >= 3:
-                    return False
-            else:
-                duplicates[hashable] = 1
+        if self.__history.get_highest_fields_counter() >= 3:
+            return False
         return True
 
     def __change_to_phase_2(self):
         """changes phase of player to 2 if player have no chips"""
         player = self.__turn
-        if player.number_chips == 0:
+        if player.get_number_chips() == 0:
             player.phase = 2
-            print("Changed Player {} into move phase".format(player.number))
+            self.logger.info("changed Player {} into phase 2".format(player.get_number()))
+            print("Changed Player {} into move phase".format(player.get_number()))
 
     def __change_to_phase_3(self):
         """changes phase of player to 3 if player have less than 3 chips on the play board"""
         opponent = self.__get_opponent()
-        if len(self.__field.get_nodes_by_state(opponent.number)) < 4 and opponent.number_chips == 0:
+        if len(self.__field.get_nodes_by_state(opponent.get_number())) < 4 and opponent.get_number_chips() == 0:
             opponent.phase = 3
-            print("Changed Player {} into jump phase".format(opponent.number))
+            self.logger.info("changed Player {} into phase 3".format(opponent.get_number()))
+            print("Changed Player {} into jump phase".format(opponent.get_number()))
 
     def __check_phase_1(self, start_pos, end_pos):
         """
@@ -468,10 +643,13 @@ class Game:
         """
 
         if start_pos is not None:
+            self.logger.debug("raise MoveException: player is in phase 1, start_pos must be None")
             raise MoveException("Player is in putting phase.")
         if self.__field.get_state(end_pos) != 0:
+            self.logger.debug("raise MoveException: one chip is already on {}".format(end_pos))
             raise MoveException("There is already a chip on this position.")
-        if self.__turn.number_chips < 1:
+        if self.__turn.get_number_chips() < 1:
+            self.logger.debug("raise MoveException: no chips")
             raise MoveException("Player has no chips to set.")
 
     def __check_phase_2(self, start_pos, end_pos):
@@ -485,13 +663,15 @@ class Game:
         :raise: MoveException if move is invalid
         """
 
-        valid_start = self.__field.get_nodes_by_state(self.__turn.number)
+        valid_start = self.__field.get_nodes_by_state(self.__turn.get_number())
 
         if start_pos not in valid_start:
-            raise MoveException("Chip is not of Player {}.".format(self.__turn.number))
+            self.logger.debug("raise MoveException: chip is not of player in turn")
+            raise MoveException("Chip is not of Player {}.".format(self.__turn.get_number()))
 
         valid_end = self.__field.get_edges_by_state(start_pos, 0)
         if end_pos not in valid_end:
+            self.logger.debug("raise MoveException: chip can not be moved")
             raise MoveException("Chip can not be moved to this position.")
 
     def __check_phase_3(self, start_pos, end_pos):
@@ -505,11 +685,13 @@ class Game:
         :raise: MoveException if move is invalid
         """
 
-        valid_start = self.__field.get_nodes_by_state(self.__turn.number)
+        valid_start = self.__field.get_nodes_by_state(self.__turn.get_number())
         valid_end = self.__field.get_nodes_by_state(0)
         if start_pos not in valid_start:
-            raise MoveException("Chip is not of Player {}.".format(self.__turn.number))
+            self.logger.debug("raise MoveException: chip not of player in turn")
+            raise MoveException("Chip is not of Player {}.".format(self.__turn.get_number()))
         if end_pos not in valid_end:
+            self.logger.debug("raise MoveException: chip can not be moved")
             raise MoveException("Chip can not be moved to this position.")
 
     def __phase_1(self, end_pos):
@@ -520,11 +702,13 @@ class Game:
         :type end_pos:tuple
         """
 
-        self.__field.set_node_state(end_pos, self.__turn.number)
+        self.__field.set_node_state(end_pos, self.__turn.get_number())
         self.__turn.put_chip()
-        print("Put chip of Player {} on position {}".format(self.__turn.number, end_pos))
+        self.logger.info("Put chip of Player {} on {}".format(self.__turn.get_number(), end_pos))
+        print("Put chip of Player {} on position {}".format(self.__turn.get_number(), end_pos))
         if self.check_on_mill(end_pos):
             self.__mill = True
+            self.logger.info("{} is in mill".format(end_pos))
             # decrease move_counter because move_counter is increased in every move. The move after a mill is the first
             # not second move.
             self.__move_counter = -1
@@ -542,11 +726,14 @@ class Game:
 
         # update graph (play board)
         self.__field.set_node_state(start_pos, 0)
-        self.__field.set_node_state(end_pos, self.__turn.number)
+        self.__field.set_node_state(end_pos, self.__turn.get_number())
+        self.logger.info("move chip of Player {} from {} to {}".format(self.__field.get_state(start_pos), start_pos,
+                                                                       end_pos))
 
         # check if the node on the new position is in a mill
         if self.check_on_mill(end_pos):
             self.__mill = True
+            self.logger.info("{} is in mill".format(end_pos))
             # decrease move_counter because move_counter is increased in every move. The move after a mill is the first
             # not second move.
             self.__move_counter = -1
@@ -563,11 +750,14 @@ class Game:
 
         # update graph (play board)
         self.__field.set_node_state(start_pos, 0)
-        self.__field.set_node_state(end_pos, self.__turn.number)
+        self.__field.set_node_state(end_pos, self.__turn.get_number())
+        self.logger.info("move chip of Player {} from {} to {}".format(self.__field.get_state(start_pos), start_pos,
+                                                                       end_pos))
 
         # check if the node on the new position is in a mill
         if self.check_on_mill(end_pos):
             self.__mill = True
+            self.logger.info("{} is in mill".format(end_pos))
 
     def __check_on_win_and_remis(self):
         """
@@ -579,18 +769,24 @@ class Game:
 
         opponent = self.__get_opponent()
         # the opponent looses if he has less than 3 chips on the play board
-        if len(self.__field.get_nodes_by_state(opponent.number)) < 3 and opponent.number_chips == 0:
-            raise WinException(self.__turn.number, self.__get_opponent().number)
+        if len(self.__field.get_nodes_by_state(opponent.get_number())) < 3 and opponent.get_number_chips() == 0:
+            self.logger.debug("raise WinException: Player {} wins".format(self.__turn.get_number()))
+            raise WinException(self.__turn.get_number(), self.__get_opponent().get_number(), 1)
 
         # opponent looses if there is not any chip he can move
-        elif not self.__field.check_exist_edges_of_state(self.__turn.number, 0):
-            raise WinException(self.__turn.number, self.__get_opponent().number)
+        elif not self.__field.check_exist_edges_of_state(opponent.get_number(), 0):
+            self.logger.debug("raise WinException: Player {} wins".format(self.__turn.get_number()))
+            raise WinException(self.__turn.get_number(), self.__get_opponent().get_number(), 2)
 
         # check on remis
-        elif self.__move_counter >= 50:
+        # 50 moves without mill
+        elif self.__history.get_move_counter() >= 50:
+            self.logger.debug("raise RemisException: 50 moves no mill")
             raise RemisException(1)
 
+        # 3 times same state of the play board
         elif not self.__check_history():
+            self.logger.debug("raise RemisException: 3 times same position")
             raise RemisException(2)
 
     def __is_valid_move(self, start_pos, end_pos):
@@ -605,8 +801,12 @@ class Game:
         """
 
         nodes = self.__field.get_nodes()
+        # check whether nodes are valid
         if (start_pos not in nodes or start_pos is None) and end_pos not in nodes:
+            self.logger.debug("raise ValueError")
             raise ValueError
+
+        # check whether move is valid for the phase of the player
         if self.__turn.phase == 1:
             self.__check_phase_1(start_pos, end_pos)
         elif self.__turn.phase == 2:
@@ -614,7 +814,28 @@ class Game:
         elif self.__turn.phase == 3:
             self.__check_phase_3(start_pos, end_pos)
         else:
+            self.logger.debug("raise ValueError")
             raise ValueError
+
+    def get_history(self):
+        """
+        returns the history
+
+        :return: the history
+        :rtype: History
+        """
+
+        return self.__history
+
+    def get_field_instance(self):
+        """
+        returns the field as Field instance
+
+        :return: the field as Field instance
+        :rtype: Field
+
+        """
+        return self.__field
 
     def get_turn(self):
         """
@@ -624,7 +845,7 @@ class Game:
         :rtype: int
         """
 
-        return self.__turn.number
+        return self.__turn.get_number()
 
     def get_field(self):
         """
@@ -636,6 +857,36 @@ class Game:
 
         return self.__field.get_states()
 
+    def get_player_1(self):
+        """
+        returns the first player
+
+        :return: the first player
+        :rtype: Player
+        """
+
+        return self.__player_1
+
+    def get_player_2(self):
+        """
+        returns the second player
+
+        :return: the second player
+        :rtype: Player
+        """
+
+        return self.__player_2
+
+    def get_mill(self):
+        """
+        returns the state of mill
+
+        :return: the state of mill
+        :rtype: bool
+        """
+
+        return self.__mill
+
     def remove_chip(self, node):
         """
         reads in a node and removes this chip of the opponent from the play board
@@ -645,11 +896,13 @@ class Game:
         :raise: MoveException if player has no chip in a mill or if node is not removeable
         """
 
+        # check whether mill really exists
         if not self.__mill:
+            self.logger.debug("raise MoveException: no mill")
             raise MoveException("There is no mill.")
 
         # all chips of the opponent are candidates to remove
-        possible_nodes_candidates = self.__field.get_nodes_by_state(self.__get_opponent().number)
+        possible_nodes_candidates = self.__field.get_nodes_by_state(self.__get_opponent().get_number())
 
         # chips in a mill are not removeable
         possible_nodes = set()
@@ -664,16 +917,19 @@ class Game:
 
         if node in possible_nodes:
             self.__field.set_node_state(node, 0)
+            self.logger.info("remove chip on {}".format(node))
             print("Remove chip of {}".format(node))
             self.__field.print_playboard()
             self.__mill = False
-            # decrease move_counter
-            self.__move_counter = 0
-            self.__check_on_win_and_remis()
+            # decrease move_counter to 0
+            self.__history.decrease_move_counter()
+            if self.__turn.phase in (2, 3):
+                self.__check_on_win_and_remis()
             self.__change_to_phase_3()
             self.__change_turn()
 
         else:
+            self.logger.debug("raise MoveException: not valid chip of opponent")
             raise MoveException("Chip is not removeable")
 
     def check_on_mill(self, node):
@@ -699,9 +955,12 @@ class Game:
         :raise: MillException if there is a mill and no chip has been removed
         """
 
+        # check whether mill exists
         if self.__mill:
+            self.logger.debug("raise MillException: mill exists")
             raise MillException
         else:
+            # check whether move is valid
             self.__is_valid_move(start_pos, end_pos)
 
             if self.__turn.phase == 1:
@@ -711,11 +970,13 @@ class Game:
             elif self.__turn.phase == 3:
                 self.__phase_3(start_pos, end_pos)
 
+            # if there is no mill finish move
             if not self.__mill:
                 self.__field.print_playboard()
-                self.__move_counter += 1
-                self.__history.append(self.get_field())
-                self.__check_on_win_and_remis()
+                self.__history.increase_move_counter()
+                self.__history.add(self.__field)
+                if self.__turn.phase in (2, 3):
+                    self.__check_on_win_and_remis()
                 self.__change_turn()
 
 
@@ -747,12 +1008,16 @@ class WinException(Exception):
     Attributes:
         number_winner (int): the number of the player who wins
         number_looser (int): the number of the player who looses
+        reason (int): the reason of win
+                        1 = looser has less than 3 chips left
+                        2 = looser can not move a chip
     """
 
-    def __init__(self, number_winner, number_looser):
+    def __init__(self, number_winner, number_looser, reason):
         """the constructor for WinException class"""
         self.number_winner = number_winner
         self.number_looser = number_looser
+        self.reason = reason
 
 
 class RemisException(Exception):
