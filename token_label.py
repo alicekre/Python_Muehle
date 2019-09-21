@@ -30,6 +30,7 @@ class token_label(QLabel):
 
         drag.setMimeData(mimedata)
         pixmap = QPixmap(self.size())
+        self.image = pixmap
         painter = QPainter(pixmap)
         painter.drawPixmap(self.rect(), self.grab())
         painter.end()

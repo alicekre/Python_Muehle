@@ -42,6 +42,7 @@ class playing_field_label(QLabel):
 
     def mousePressEvent(self, event):
         print("Pressed")
+        print("plaing field label")
         if event.button() == Qt.LeftButton:
             self.drag_start_position = event.pos()
             #self.start_position=event.globalPos()
@@ -63,14 +64,13 @@ class playing_field_label(QLabel):
         mimedata = QMimeData()
         mimedata.setText(self.text())
         mimedata.setImageData(self.pixmap().toImage())
-
         drag.setMimeData(mimedata)
-        pixmap = QPixmap(self.size())
+        pixmap = QPixmap(self.size())       
         painter = QPainter(pixmap)
         painter.drawPixmap(self.rect(), self.grab())
         painter.end()
         drag.setPixmap(pixmap)
-        #drag.setHotSpot(event.pos())
+        drag.setHotSpot(event.pos())
         self.clear()
         print("Moving")
         drag.exec_(Qt.MoveAction)

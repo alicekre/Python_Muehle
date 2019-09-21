@@ -28,6 +28,7 @@ class playing_field_label(QLabel):
     def dropEvent(self, event):
         if event.mimeData().hasImage():
             print("dropEvent")
+            print("field_label")
             #self.drop_position=self.pos()
 #            print(self)
             for name in self.dialog.field_names:
@@ -66,6 +67,7 @@ class playing_field_label(QLabel):
 
         drag.setMimeData(mimedata)
         pixmap = QPixmap(self.size())
+        self.image = pixmap
         painter = QPainter(pixmap)
         painter.drawPixmap(self.rect(), self.grab())
         painter.end()

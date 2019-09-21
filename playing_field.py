@@ -7,7 +7,7 @@ Created on Fri Aug  2 17:38:20 2019
 """
 import sys
 
-from PyQt5 import QtCore, QtWidgets, uic
+from PyQt5 import QtCore, QtWidgets, uic, QtGui
 
 from PyQt5.QtGui import QPixmap
 
@@ -74,6 +74,7 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         self.window1=Window()
         self.window2=Window()
         self.window3=Window()
+        self.window4=Window()
         self.removable=False
         
     def turn(self):
@@ -102,16 +103,24 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             print("Invalid move. Try again: ")
             self.window3.initUI("Zug nicht erlaubt. \n Probier's nochmal!" 
                               , "Unerlaubter Zug")
+            
+            if self.game.get_turn()==1:
+                getattr(self, "label_{}".format(self.start_label)).setPixmap(QtGui.QPixmap("blau.png"))
+            if self.game.get_turn()==2:
+                getattr(self, "label_{}".format(self.start_label)).setPixmap(QtGui.QPixmap("gelb.png"))
+            getattr(self, "label_{}".format(self.end_label)).clear()
+            self.label_121.clear()
                                     
         except WinException as e:
             print("Player {} wins, player {} looses".format(e.number_winner, e.number_looser))
-            self.won_ui(self.game.e.number_winner,self.game.e.number_looser,1)
-            quit()
+            self.won_ui(e.number_winner, e.number_looser,1)
+            
 
 # TODO print reason for remis
         except RemisException as e:
             print("Remis! Nobody wins.")
-            quit()
+            self.remis_ui(e.reason)
+            
 
         except KeyboardInterrupt:
             print("Quit? (y/n):", end="")
@@ -177,14 +186,14 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             reason_text="Spieler {} hat keine Spielsteine mehr.".format(looser)
         if reason == 2:
             reason_text="Spieler {} kann sich nicht mehr bewegen.".format(looser)
-        self.window.initUI("Spieler {} hat gewonnen. ".format(winner)+ reason_text
+        self.window4.initUI("Spieler {} hat gewonnen. ".format(winner)+ reason_text
                            , "Won")
     def remis_ui(self,reason):
         if reason==1:
-            self.window.initUI("Remis: "
+            self.window3.initUI("Remis: Es gab in 50 aufeinanderfolgenden Züge keine Mühle "
                            , "Remis")
         if reason==2:
-            self.window.initUI("Remis: "
+            self.window3.initUI("Remis: Es wurde drei mal die selbe Stellung erreicht"
                            , "Remis")
             
         
