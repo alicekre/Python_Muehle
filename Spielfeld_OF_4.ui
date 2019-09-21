@@ -1094,7 +1094,7 @@
      </spacer>
     </item>
     <item>
-     <widget class="QGroupBox" name="Spieler_2">
+     <widget class="QGroupBox" name="player2">
       <property name="title">
        <string>Spieler_2</string>
       </property>
@@ -1296,6 +1296,22 @@
         <pixmap>gelb.png</pixmap>
        </property>
       </widget>
+      <widget class="phase" name="Sp2_phase">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>730</y>
+         <width>57</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Phase1</string>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -1311,7 +1327,10 @@
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QGroupBox" name="player1">
+      <property name="styleSheet">
+       <string notr="true">color: rgb(204, 0, 0);</string>
+      </property>
       <property name="title">
        <string>Spieler_1</string>
       </property>
@@ -1648,6 +1667,22 @@
         <bool>false</bool>
        </property>
       </widget>
+      <widget class="phase" name="Sp1_phase">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>730</y>
+         <width>57</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Phase1</string>
+       </property>
+      </widget>
      </widget>
     </item>
     <item>
@@ -1677,6 +1712,11 @@
    <extends>QLabel</extends>
    <header>playing_field_label.h</header>
   </customwidget>
+  <customwidget>
+   <class>phase</class>
+   <extends>QLabel</extends>
+   <header>phase.h</header>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
@@ -1684,17 +1724,20 @@
    <sender>Reset_pushButton</sender>
    <signal>clicked()</signal>
    <receiver>Dialog</receiver>
-   <slot>update()</slot>
+   <slot>resetMill()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>622</x>
-     <y>788</y>
+     <x>554</x>
+     <y>790</y>
     </hint>
     <hint type="destinationlabel">
-     <x>624</x>
-     <y>834</y>
+     <x>589</x>
+     <y>859</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>resetMill()</slot>
+ </slots>
 </ui>
