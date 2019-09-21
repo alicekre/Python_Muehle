@@ -77,8 +77,8 @@ def main():
                             print("Choose valid chip to remove.")
 
                 # DEBUG
-                saver = storage.Saver(game, "savedGames/{}-mill.json".format(time.time()))
-                saver.save()
+                # saver = storage.Saver(game, "savedGames/{}-mill.json".format(time.time()))
+                # saver.save()
 
             except ValueError:
                 print("Invalid node. Try again: ")
@@ -86,7 +86,14 @@ def main():
                 print("Invalid move. Try again: ")
 
     except WinException as e:
+        reason = e.reason
+        if reason == 1:
+            reason = "less than 3 chips"
+        elif reason == 2:
+            reason = "can not move a chip"
+
         print("Player {} wins, player {} looses".format(e.number_winner, e.number_looser))
+        print("Reason: ", reason)
         quit()
 
     except RemisException as e:

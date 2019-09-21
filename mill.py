@@ -771,12 +771,12 @@ class Game:
         # the opponent looses if he has less than 3 chips on the play board
         if len(self.__field.get_nodes_by_state(opponent.get_number())) < 3 and opponent.get_number_chips() == 0:
             self.logger.debug("raise WinException: Player {} wins".format(self.__turn.get_number()))
-            raise WinException(self.__turn.get_number(), self.__get_opponent().get_number())
+            raise WinException(self.__turn.get_number(), self.__get_opponent().get_number(), 1)
 
         # opponent looses if there is not any chip he can move
         elif not self.__field.check_exist_edges_of_state(opponent.get_number(), 0):
             self.logger.debug("raise WinException: Player {} wins".format(self.__turn.get_number()))
-            raise WinException(self.__turn.get_number(), self.__get_opponent().get_number())
+            raise WinException(self.__turn.get_number(), self.__get_opponent().get_number(), 2)
 
         # check on remis
         # 50 moves without mill
@@ -1008,12 +1008,16 @@ class WinException(Exception):
     Attributes:
         number_winner (int): the number of the player who wins
         number_looser (int): the number of the player who looses
+        reason (int): the reason of win
+                        1 = looser has less than 3 chips left
+                        2 = looser can not move a chip
     """
 
-    def __init__(self, number_winner, number_looser):
+    def __init__(self, number_winner, number_looser, reason):
         """the constructor for WinException class"""
         self.number_winner = number_winner
         self.number_looser = number_looser
+        self.reason = reason
 
 
 class RemisException(Exception):
