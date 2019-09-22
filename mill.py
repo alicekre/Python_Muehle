@@ -709,9 +709,7 @@ class Game:
         if self.check_on_mill(end_pos):
             self.__mill = True
             self.logger.info("{} is in mill".format(end_pos))
-            # decrease move_counter because move_counter is increased in every move. The move after a mill is the first
-            # not second move.
-            self.__move_counter = -1
+            self.__history.decrease_move_counter()
         self.__change_to_phase_2()
 
     def __phase_2(self, start_pos, end_pos):
@@ -736,7 +734,7 @@ class Game:
             self.logger.info("{} is in mill".format(end_pos))
             # decrease move_counter because move_counter is increased in every move. The move after a mill is the first
             # not second move.
-            self.__move_counter = -1
+            self.__history.decrease_move_counter()
 
     def __phase_3(self, start_pos, end_pos):
         """
@@ -758,6 +756,7 @@ class Game:
         if self.check_on_mill(end_pos):
             self.__mill = True
             self.logger.info("{} is in mill".format(end_pos))
+            self.__history.decrease_move_counter()
 
     def __check_on_win_and_remis(self):
         """
@@ -835,6 +834,7 @@ class Game:
         :rtype: Field
 
         """
+        
         return self.__field
 
     def get_turn(self):
