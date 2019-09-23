@@ -49,6 +49,7 @@ def read_node(msg):
         except (ValueError, SyntaxError):
             print("Input is not a valid node! Try again:")
 
+
 def main():
     logger.info("start new game")
     print("Do you want to load a saved Game? (y/n):", end="")
@@ -115,4 +116,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main_logic()
+    main()

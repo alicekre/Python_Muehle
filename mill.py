@@ -834,7 +834,7 @@ class Game:
         :rtype: Field
 
         """
-        
+
         return self.__field
 
     def get_turn(self):
