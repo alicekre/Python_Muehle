@@ -1,4 +1,4 @@
-from PyQt5 import Qt
+
 from PyQt5.QtCore import Qt,QMimeData
 from PyQt5.QtGui import QImage
 from PyQt5.QtGui import QPixmap, QDrag, QPainter
@@ -34,10 +34,11 @@ class playing_field_label(QLabel):
                 if self == getattr(self.dialog, "label_{}".format(name)):
                     self.dialog.end_label=name
                     #ToDo: nie True
-            self.dialog.turn()
+
                 
             self.setPixmap(QPixmap.fromImage(QImage(event.mimeData().imageData())))
 
+            self.dialog.turn()
    
 
     def mousePressEvent(self, event):
