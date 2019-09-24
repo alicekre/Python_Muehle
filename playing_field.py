@@ -249,8 +249,13 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
                         (3, 3, 2): 0,
                         (3, 3, 3): 0
                         }
+        player_1 = Player(1)
+        player_2 = Player(2)
+        turn = player_1
+        history = History()
+        mill = False
 
-        self.game=Game(field=Field(empty_field))
+        self.game=Game(field=Field(empty_field), player_1=player_1, player_2=player_2, turn=turn, history=history, mill=mill)
         print("Ausgangszustand")
         saver = storage.Saver(self.game)
         saver.save()
