@@ -15,7 +15,24 @@ from PyQt5.QtGui import QPixmap
 from mill import *
 from open_window import Window
 
+# create logger
+logger = logging.getLogger('application')
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages and another which logs even info messages
+fh_1 = logging.FileHandler('debug.log')
+fh_2 = logging.FileHandler('info.log')
+fh_1.setLevel(logging.DEBUG)
+fh_2.setLevel(logging.INFO)
+# create formatters and add it to the handlers
+formatter_1 = logging.Formatter('%(asctime)s - %(name)30s : %(funcName)30s, ln %(lineno)4s - %(levelname)8s - '
+                                '%(message)s')
+formatter_2 = logging.Formatter('%(asctime)s - %(name)30s : %(levelname)8s - %(message)s')
+fh_1.setFormatter(formatter_1)
+fh_2.setFormatter(formatter_2)
 
+# add the handlers to the logger
+logger.addHandler(fh_1)
+logger.addHandler(fh_2)
 
 Ui_MainWindow, WindowBaseClass = uic.loadUiType("Spielfeld_OF_4.ui")
 #from mill import Game
@@ -129,9 +146,9 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
 #            if input() == "y":
 #                quit()
         finally:       
-            self.Sp1_phase.setText("Phase{}".format(self.game.get_phase_player_1()))
-            self.Sp2_phase.setText("Phase{}".format(self.game.get_phase_player_1()))  
-            print(self.game.get_phase_player_1())
+            self.Sp1_phase.setText("Phase{}".format(self.game.get_player_1().phase))
+            self.Sp2_phase.setText("Phase{}".format(self.game.get_player_1().phase))
+            print(self.game.get_player_1().phase)
             if self.game.get_turn()==1:
                 self.player1.setStyleSheet('QGroupBox {color: red; }')
                 self.player2.setStyleSheet('QGroupBox {color: black; }')
@@ -149,13 +166,13 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
                 elif current_field[label_tuple]==2:
                     getattr(self,"label_{}".format(label)).setPixmap(QtGui.QPixmap("gelb.png"))
                     print(label)
-#            chips_left_player_1 = self.game.get_player_1().get_number_chips()
-#            for i  in range(10-chips_left_player_1 , 10):
-#                getattr(self, "blau_{}".format(i)).setPixmap(QtGui.QPixmap("blau.png"))
-#            chips_left_player_2 = self.game.get_player_2().get_number_chips()
-#            for i  in range(10-chips_left_player_2 , 10):
-#                getattr(self, "blau_{}".format(i)).setPixmap(QtGui.QPixmap("blau.png"))
-#                
+            chips_left_player_1 = self.game.get_player_1().get_number_chips()
+            for i  in range(10-chips_left_player_1 , 10):
+                getattr(self, "blau_{}".format(i)).setPixmap(QtGui.QPixmap("blau.png"))
+            chips_left_player_2 = self.game.get_player_2().get_number_chips()
+            for i  in range(10-chips_left_player_2 , 10):
+               getattr(self, "gelb_{}".format(i)).setPixmap(QtGui.QPixmap("gelb.png"))
+
             
             
 
@@ -172,8 +189,8 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
                                 "Wähle einen anderen."
                               , "Falscher Stein entfernt")
             
-        self.Sp1_phase.setText("Phase{}".format(self.game.get_phase_player_1()))
-        self.Sp2_phase.setText("Phase{}".format(self.game.get_phase_player_1()))      
+        self.Sp1_phase.setText("Phase{}".format(self.game.get_player_1().phase))
+        self.Sp2_phase.setText("Phase{}".format(self.game.get_player_1().phase))
         if self.game.get_turn()==1:
             self.player1.setStyleSheet('QGroupBox {color: red; }')
             self.player2.setStyleSheet('QGroupBox {color: black; }')
