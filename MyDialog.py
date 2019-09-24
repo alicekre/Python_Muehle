@@ -7,7 +7,7 @@ Created on Fri Aug  2 17:38:20 2019
 """
 import sys
 
-from PyQt5 import QtCore, QtWidgets, uic, QtGui
+from PyQt5 import QtCore, QtWidgets, uic
 
 from PyQt5.QtGui import QPixmap
 
@@ -59,7 +59,7 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
                             self.label_332: self.label_332.pos(),
                             self.label_333: self.label_333.pos()}
 
-
+        
         for label in self.field_label:
             label.saveDialog(self)
       
@@ -71,14 +71,10 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         for label in (self.yellow_token):
             label.saveDialog(self)
         self.game=Game()
-        self.window1=Window()
-        self.window2=Window()
-        self.window3=Window()
-        self.window4=Window()
+        self.window=Window()
         self.removable=False
         
     def turn(self):
-        #self.Sp2_phase.setStyleSheet('QGroupBox {color: red; }')
         print(self.start_label, self.end_label)
         
         if self.start_label!=None:
@@ -92,7 +88,7 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         try:
             self.game.move(start_pos, end_pos)
             if self.game.check_on_mill(end_pos):
-                self.window1.initUI("Du darfst einen Spielstein des Gegners entfernen"
+                self.window.initUI("Du darfst einen Spielstein des Gegners entfernen"
                               , "Mühle")
                 print("{} is in a mill.".format(end_pos))
                 self.removable=True
@@ -101,64 +97,29 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             print("Invalid node. Try again: ")
         except MoveException:
             print("Invalid move. Try again: ")
-            self.window3.initUI("Zug nicht erlaubt. \n Probier's nochmal!" 
-                              , "Unerlaubter Zug")
-            
-#            if self.game.get_turn()==1:
-#                getattr(self, "label_{}".format(self.start_label)).setPixmap(QtGui.QPixmap("blau.png"))
-#            if self.game.get_turn()==2:
-#                getattr(self, "label_{}".format(self.start_label)).setPixmap(QtGui.QPixmap("gelb.png"))
-#            getattr(self, "label_{}".format(self.end_label)).clear()
-#            self.label_121.clear()
-            
-            
-#                                    
+                                    
         except WinException as e:
             print("Player {} wins, player {} looses".format(e.number_winner, e.number_looser))
-            self.won_ui(e.number_winner, e.number_looser,1)
-            
+            self.won_ui(self.game.e.number_winner,self.game.e.number_looser,no_token_left)
+            quit()
 
 # TODO print reason for remis
         except RemisException as e:
             print("Remis! Nobody wins.")
-            self.remis_ui(e.reason)
-            
+            quit()
 
-#        except KeyboardInterrupt:
-#            print("Quit? (y/n):", end="")
-#            if input() == "y":
-#                quit()
-        finally:       
-            self.Sp1_phase.setText("Phase{}".format(self.game.get_phase_player_1()))
-            self.Sp2_phase.setText("Phase{}".format(self.game.get_phase_player_1()))  
-            print(self.game.get_phase_player_1())
-            if self.game.get_turn()==1:
-                self.player1.setStyleSheet('QGroupBox {color: red; }')
-                self.player2.setStyleSheet('QGroupBox {color: black; }')
-            if self.game.get_turn()==2:
-                self.player1.setStyleSheet('QGroupBox {color: black; }')
-                self.player2.setStyleSheet('QGroupBox {color: red; }')
-            current_field = self.game.get_field()
-            for label in self.field_names:
-                label_tuple =(int(label[0]),int(label[1]),
-                    int(label[2]))
-                if current_field[label_tuple]==0:
-                    getattr(self,"label_{}".format(label)).clear()
-                elif current_field[label_tuple]==1:
-                    getattr(self,"label_{}".format(label)).setPixmap(QtGui.QPixmap("blau.png"))
-                elif current_field[label_tuple]==2:
-                    getattr(self,"label_{}".format(label)).setPixmap(QtGui.QPixmap("gelb.png"))
-                    print(label)
-#            chips_left_player_1 = self.game.get_player_1().get_number_chips()
-#            for i  in range(10-chips_left_player_1 , 10):
-#                getattr(self, "blau_{}".format(i)).setPixmap(QtGui.QPixmap("blau.png"))
-#            chips_left_player_2 = self.game.get_player_2().get_number_chips()
-#            for i  in range(10-chips_left_player_2 , 10):
-#                getattr(self, "blau_{}".format(i)).setPixmap(QtGui.QPixmap("blau.png"))
-#                
+        except KeyboardInterrupt:
+            print("Quit? (y/n):", end="")
+            if input() == "y":
+                quit()
+                
             
-            
-
+        if self.game.get_turn()==1:
+            self.player1.setStyleSheet('QGroupBox {color: red; }')
+            self.player2.setStyleSheet('QGroupBox {color: black; }')
+        if self.game.get_turn()==2:
+            self.player1.setStyleSheet('QGroupBox {color: black; }')
+            self.player2.setStyleSheet('QGroupBox {color: red; }')
             
     def remove(self):     
         try:
@@ -168,20 +129,13 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             getattr(self, "label_{}".format(self.start_label)).clear()
         except MoveException:
             print("Choose valid chip to remove.")
-            self.window2.initUI("Du darfst diesen Stein nicht entfernen." +"\n" +
-                                "Wähle einen anderen."
-                              , "Falscher Stein entfernt")
             
-        self.Sp1_phase.setText("Phase{}".format(self.game.get_phase_player_1()))
-        self.Sp2_phase.setText("Phase{}".format(self.game.get_phase_player_1()))      
         if self.game.get_turn()==1:
             self.player1.setStyleSheet('QGroupBox {color: red; }')
             self.player2.setStyleSheet('QGroupBox {color: black; }')
         if self.game.get_turn()==2:
             self.player1.setStyleSheet('QGroupBox {color: black; }')
             self.player2.setStyleSheet('QGroupBox {color: red; }')
-        
-        
             
     def resetMill(self, image):
         #Ui_MainWindow, WindowBaseClass = uic.loadUiType("Spielfeld_OF_4.ui")
@@ -195,29 +149,27 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
 
         self.player1.setStyleSheet('QGroupBox {color: red; }')
         self.player2.setStyleSheet('QGroupBox {color: black; }')
-        self.Sp1_phase.setText("Phase1")
-        self.Sp2_phase.setText("Phase1")
-        self.game=Game()
+
         print("Ausgangszustand")
     
-#    def phase_2_ui(self,player):
-#        self.window.initUI("Remis: "
-#                           , "Remis")
-#    def phase_3_ui(self,player):
-#        pass
+    def phase_2_ui(self,player):
+        self.window.initUI("Remis: "
+                           , "Remis")
+    def phase_3_ui(self,player):
+        pass
     def won_ui(self, winner, looser, reason):
-        if reason == 1:
+        if reason == no_token_left:
             reason_text="Spieler {} hat keine Spielsteine mehr.".format(looser)
-        if reason == 2:
+        if reason == not_able_to_move:
             reason_text="Spieler {} kann sich nicht mehr bewegen.".format(looser)
-        self.window4.initUI("Spieler {} hat gewonnen. ".format(winner)+ reason_text
+        self.window.initUI("Spieler {} hat gewonnen. ".format(winner)+ reason_text
                            , "Won")
     def remis_ui(self,reason):
         if reason==1:
-            self.window3.initUI("Remis: Es gab in 50 aufeinanderfolgenden Züge keine Mühle "
+            self.window.initUI("Remis: "
                            , "Remis")
         if reason==2:
-            self.window3.initUI("Remis: Es wurde drei mal die selbe Stellung erreicht"
+            self.window.initUI("Remis: "
                            , "Remis")
             
         
