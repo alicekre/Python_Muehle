@@ -100,11 +100,9 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             #self.Sp2_phase.setStyleSheet('QGroupBox {color: red; }')
             print(self.start_label, self.end_label)
 
-            if self.start_label!=None:
-                start_pos =(int(self.start_label[0]),int(self.start_label[1]),
-                        int(self.start_label[2]))
-            else:
-                start_pos=None
+            start_pos =(int(self.start_label[0]),int(self.start_label[1]),
+                    int(self.start_label[2]))
+
             print(start_pos)
             end_pos = (int(self.end_label[0]),int(self.end_label[1]),
                         int(self.end_label[2]))
