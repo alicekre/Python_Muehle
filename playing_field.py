@@ -95,22 +95,27 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         self.window4=Window()
         self.removable=False
         
+        
     def turn(self):
-        try:
+   
             #self.Sp2_phase.setStyleSheet('QGroupBox {color: red; }')
-            print(self.start_label, self.end_label)
+        print(self.start_label, self.end_label)
 
-            start_pos =(int(self.start_label[0]),int(self.start_label[1]),
-                    int(self.start_label[2]))
+        start_pos =(int(self.start_label[0]),int(self.start_label[1]),
+            int(self.start_label[2]))
 
-            print(start_pos)
-            end_pos = (int(self.end_label[0]),int(self.end_label[1]),
-                        int(self.end_label[2]))
-
+        print(start_pos)
+        end_pos = (int(self.end_label[0]),int(self.end_label[1]),
+           int(self.end_label[2]))
+        try:
             self.game.move(start_pos, end_pos)
-
-            self.update_field()
-
+            if self.game.check_on_mill(end_pos):
+                self.window1.initUI("Du darfst einen Spielstein des Gegners entfernen"
+                                    , "Mühle")
+                print("{} is in a mill.".format(end_pos))
+                self.removable = True
+                self.update_field()
+            
         except ValueError:
             print("Invalid node. Try again: ")
 
@@ -119,21 +124,12 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             self.window3.initUI("Zug nicht erlaubt. \n Probier's nochmal!" 
                               , "Unerlaubter Zug")
             
-#            if self.game.get_turn()==1:
-#                getattr(self, "label_{}".format(self.start_label)).setPixmap(QtGui.QPixmap("blau.png"))
-#            if self.game.get_turn()==2:
-#                getattr(self, "label_{}".format(self.start_label)).setPixmap(QtGui.QPixmap("gelb.png"))
-#            getattr(self, "label_{}".format(self.end_label)).clear()
-#            self.label_121.clear()
-            
-            
-#                                    
+
         except WinException as e:
             print("Player {} wins, player {} looses".format(e.number_winner, e.number_looser))
-            self.won_ui(e.number_winner, e.number_looser,1)
-            
+            self.won_ui(e.number_winner, e.number_looser,e.reason)
+        
 
-# TODO print reason for remis
         except RemisException as e:
             print("Remis! Nobody wins.")
             self.remis_ui(e.reason)
@@ -153,9 +149,10 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
 
         if self.game.check_on_mill(end_pos):
             self.window1.initUI("Du darfst einen Spielstein des Gegners entfernen"
-                                , "Mühle")
+                                    , "Mühle")
             print("{} is in a mill.".format(end_pos))
             self.removable = True
+            self.update_field()
             
     def update_field(self):
         current_field = self.game.get_field()
@@ -191,6 +188,15 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             self.window2.initUI("Du darfst diesen Stein nicht entfernen." +"\n" +
                                 "Wähle einen anderen."
                               , "Falscher Stein entfernt")
+        except WinException as e:
+            print("Player {} wins, player {} looses".format(e.number_winner, e.number_looser))
+            self.won_ui(e.number_winner, e.number_looser,e.reason)
+        
+
+        except RemisException as e:
+            print("Remis! Nobody wins.")
+            self.remis_ui(e.reason)
+
             
         self.Sp1_phase.setText("Phase{}".format(self.game.get_player_1().phase))
         self.Sp2_phase.setText("Phase{}".format(self.game.get_player_1().phase))
