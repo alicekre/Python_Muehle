@@ -65,6 +65,8 @@ class playing_field_label(QLabel):
         drag = QDrag(self)
         mimedata = QMimeData()
         mimedata.setText(self.text())
+        if self.pixmap()==None:
+            return
         mimedata.setImageData(self.pixmap().toImage())
         drag.setMimeData(mimedata)
         pixmap = QPixmap(self.size())       
