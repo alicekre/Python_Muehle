@@ -98,7 +98,6 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         
     def turn(self):
    
-            #self.Sp2_phase.setStyleSheet('QGroupBox {color: red; }')
         print(self.start_label, self.end_label)
 
         start_pos =(int(self.start_label[0]),int(self.start_label[1]),
@@ -123,7 +122,8 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             print("Invalid move. Try again: ")
             self.window3.initUI("Zug nicht erlaubt. \n Probier's nochmal!" 
                               , "Unerlaubter Zug")
-            
+        except MillException as e:
+            self.update_field()   
 
         except WinException as e:
             print("Player {} wins, player {} looses".format(e.number_winner, e.number_looser))
@@ -135,26 +135,26 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             self.remis_ui(e.reason)
 
         finally:       
-            self.Sp1_phase.setText("Phase{}".format(self.game.get_player_1().phase))
-            self.Sp2_phase.setText("Phase{}".format(self.game.get_player_1().phase))
-            print(self.game.get_player_1().phase)
-            if self.game.get_turn()==1:
-                self.player1.setStyleSheet('QGroupBox {color: red; }')
-                self.player2.setStyleSheet('QGroupBox {color: black; }')
-            if self.game.get_turn()==2:
-                self.player1.setStyleSheet('QGroupBox {color: black; }')
-                self.player2.setStyleSheet('QGroupBox {color: red; }')
+            
 
             self.update_field()
 
-        if self.game.check_on_mill(end_pos):
-            self.window1.initUI("Du darfst einen Spielstein des Gegners entfernen"
-                                    , "Mühle")
-            print("{} is in a mill.".format(end_pos))
-            self.removable = True
-            self.update_field()
             
     def update_field(self):
+        
+        self.Sp1_phase.setText("Phase{}".format(self.game.get_player_1().phase))
+        self.Sp2_phase.setText("Phase{}".format(self.game.get_player_1().phase))
+        print(self.game.get_player_1().phase)
+        print(self.game.get_player_2().phase)
+        
+        
+        if self.game.get_turn()==1:
+            self.player1.setStyleSheet('QGroupBox {color: red; }')
+            self.player2.setStyleSheet('QGroupBox {color: black; }')
+        if self.game.get_turn()==2:
+            self.player1.setStyleSheet('QGroupBox {color: black; }')
+            self.player2.setStyleSheet('QGroupBox {color: red; }')
+            
         current_field = self.game.get_field()
         for label in self.field_names:
             label_tuple = (int(label[0]), int(label[1]),
@@ -166,6 +166,7 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             elif current_field[label_tuple] == 2:
                 getattr(self, "label_{}".format(label)).setPixmap(QtGui.QPixmap("gelb.png"))
                 print(label)
+                
         chips_left_player_1 = self.game.get_player_1().get_number_chips()
         for i in range(1, chips_left_player_1 + 1):
             getattr(self, "blau_{}".format(i)).setPixmap(QtGui.QPixmap("blau.png"))
@@ -196,6 +197,8 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         except RemisException as e:
             print("Remis! Nobody wins.")
             self.remis_ui(e.reason)
+            
+       
         finally:
             self.update_field()
 
