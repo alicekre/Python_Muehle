@@ -14,6 +14,7 @@ from PyQt5.QtGui import QPixmap
 
 from mill import *
 from open_window import Window
+import storage
 
 # create logger
 logger = logging.getLogger('application')
@@ -95,27 +96,26 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         self.removable=False
         
     def turn(self):
-        #self.Sp2_phase.setStyleSheet('QGroupBox {color: red; }')
-        print(self.start_label, self.end_label)
-        
-        if self.start_label!=None:
-            start_pos =(int(self.start_label[0]),int(self.start_label[1]),
-                    int(self.start_label[2]))
-        else:
-            start_pos=None
-        print(start_pos)
-        end_pos = (int(self.end_label[0]),int(self.end_label[1]),
-                    int(self.end_label[2])) 
         try:
+            #self.Sp2_phase.setStyleSheet('QGroupBox {color: red; }')
+            print(self.start_label, self.end_label)
+
+            if self.start_label!=None:
+                start_pos =(int(self.start_label[0]),int(self.start_label[1]),
+                        int(self.start_label[2]))
+            else:
+                start_pos=None
+            print(start_pos)
+            end_pos = (int(self.end_label[0]),int(self.end_label[1]),
+                        int(self.end_label[2]))
+
             self.game.move(start_pos, end_pos)
-            if self.game.check_on_mill(end_pos):
-                self.window1.initUI("Du darfst einen Spielstein des Gegners entfernen"
-                              , "Mühle")
-                print("{} is in a mill.".format(end_pos))
-                self.removable=True
-              
+
+            self.update_field()
+
         except ValueError:
             print("Invalid node. Try again: ")
+
         except MoveException:
             print("Invalid move. Try again: ")
             self.window3.initUI("Zug nicht erlaubt. \n Probier's nochmal!" 
@@ -139,12 +139,7 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         except RemisException as e:
             print("Remis! Nobody wins.")
             self.remis_ui(e.reason)
-            
 
-#        except KeyboardInterrupt:
-#            print("Quit? (y/n):", end="")
-#            if input() == "y":
-#                quit()
         finally:       
             self.Sp1_phase.setText("Phase{}".format(self.game.get_player_1().phase))
             self.Sp2_phase.setText("Phase{}".format(self.game.get_player_1().phase))
@@ -155,27 +150,33 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             if self.game.get_turn()==2:
                 self.player1.setStyleSheet('QGroupBox {color: black; }')
                 self.player2.setStyleSheet('QGroupBox {color: red; }')
-            current_field = self.game.get_field()
-            for label in self.field_names:
-                label_tuple =(int(label[0]),int(label[1]),
-                    int(label[2]))
-                if current_field[label_tuple]==0:
-                    getattr(self,"label_{}".format(label)).clear()
-                elif current_field[label_tuple]==1:
-                    getattr(self,"label_{}".format(label)).setPixmap(QtGui.QPixmap("blau.png"))
-                elif current_field[label_tuple]==2:
-                    getattr(self,"label_{}".format(label)).setPixmap(QtGui.QPixmap("gelb.png"))
-                    print(label)
-            chips_left_player_1 = self.game.get_player_1().get_number_chips()
-            for i  in range(10-chips_left_player_1 , 10):
-                getattr(self, "blau_{}".format(i)).setPixmap(QtGui.QPixmap("blau.png"))
-            chips_left_player_2 = self.game.get_player_2().get_number_chips()
-            for i  in range(10-chips_left_player_2 , 10):
-               getattr(self, "gelb_{}".format(i)).setPixmap(QtGui.QPixmap("gelb.png"))
 
-            
-            
+            self.update_field()
 
+        if self.game.check_on_mill(end_pos):
+            self.window1.initUI("Du darfst einen Spielstein des Gegners entfernen"
+                                , "Mühle")
+            print("{} is in a mill.".format(end_pos))
+            self.removable = True
+            
+    def update_field(self):
+        current_field = self.game.get_field()
+        for label in self.field_names:
+            label_tuple = (int(label[0]), int(label[1]),
+                           int(label[2]))
+            if current_field[label_tuple] == 0:
+                getattr(self, "label_{}".format(label)).clear()
+            elif current_field[label_tuple] == 1:
+                getattr(self, "label_{}".format(label)).setPixmap(QtGui.QPixmap("blau.png"))
+            elif current_field[label_tuple] == 2:
+                getattr(self, "label_{}".format(label)).setPixmap(QtGui.QPixmap("gelb.png"))
+                print(label)
+        chips_left_player_1 = self.game.get_player_1().get_number_chips()
+        for i in range(1, chips_left_player_1):
+            getattr(self, "blau_{}".format(i)).setPixmap(QtGui.QPixmap("blau.png"))
+        chips_left_player_2 = self.game.get_player_2().get_number_chips()
+        for i in range(1, chips_left_player_2 + 1):
+            getattr(self, "gelb_{}".format(i)).setPixmap(QtGui.QPixmap("gelb.png"))
             
     def remove(self):     
         try:
@@ -214,8 +215,37 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         self.player2.setStyleSheet('QGroupBox {color: black; }')
         self.Sp1_phase.setText("Phase1")
         self.Sp2_phase.setText("Phase1")
-        self.game=Game()
+        empty_field = {
+                        (1, 1, 1): 0,
+                        (1, 1, 2): 0,
+                        (1, 1, 3): 0,
+                        (1, 2, 1): 0,
+                        (1, 2, 3): 0,
+                        (1, 3, 1): 0,
+                        (1, 3, 2): 0,
+                        (1, 3, 3): 0,
+                        (2, 1, 1): 0,
+                        (2, 1, 2): 0,
+                        (2, 1, 3): 0,
+                        (2, 2, 1): 0,
+                        (2, 2, 3): 0,
+                        (2, 3, 1): 0,
+                        (2, 3, 2): 0,
+                        (2, 3, 3): 0,
+                        (3, 1, 1): 0,
+                        (3, 1, 2): 0,
+                        (3, 1, 3): 0,
+                        (3, 2, 1): 0,
+                        (3, 2, 3): 0,
+                        (3, 3, 1): 0,
+                        (3, 3, 2): 0,
+                        (3, 3, 3): 0
+                        }
+
+        self.game=Game(field=Field(empty_field))
         print("Ausgangszustand")
+        saver = storage.Saver(self.game)
+        saver.save()
     
 #    def phase_2_ui(self,player):
 #        self.window.initUI("Remis: "
