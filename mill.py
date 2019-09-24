@@ -642,9 +642,16 @@ class Game:
         :raise: MoveException if move is invalid
         """
 
-        if start_pos is not None:
+        if start_pos not in ((0, 0, 1), (0, 0, 2)):
             self.logger.debug("raise MoveException: player is in phase 1, start_pos must be None")
             raise MoveException("Player is in putting phase.")
+        if start_pos == (0, 0, 1) and self.__turn.get_number() != 1:
+            self.logger.debug("Chip is not of player in turn")
+            raise MoveException("chip is not in player turn")
+        if start_pos == (0, 0, 2) and self.__turn.get_number() != 2:
+            self.logger.debug("Chip is not of player in turn")
+            raise MoveException("chip is not in player turn")
+
         if self.__field.get_state(end_pos) != 0:
             self.logger.debug("raise MoveException: one chip is already on {}".format(end_pos))
             raise MoveException("There is already a chip on this position.")
@@ -801,7 +808,7 @@ class Game:
 
         nodes = self.__field.get_nodes()
         # check whether nodes are valid
-        if (start_pos not in nodes or start_pos is None) and end_pos not in nodes:
+        if (start_pos not in nodes or start_pos in ((0, 0, 1), (0, 0, 2))) and end_pos not in nodes:
             self.logger.debug("raise ValueError")
             raise ValueError
 

@@ -15,8 +15,14 @@ class token_label(QLabel):
     def mousePressEvent(self, event):
         print("Pressed")
         if event.button() == Qt.LeftButton:
+            for name in range(1, 10):
+                if self == getattr(self.dialog, "blau_{}".format(name)):
+                    self.dialog.start_label = "001"
+
+            for name in range(1, 10):
+                if self == getattr(self.dialog, "gelb_{}".format(name)):
+                    self.dialog.start_label = "002"
             self.drag_start_position = event.pos()
-            self.dialog.start_label=None
 
     def mouseMoveEvent(self, event):
         if not (event.buttons() & Qt.LeftButton):
