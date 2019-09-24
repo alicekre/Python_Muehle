@@ -196,6 +196,8 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         except RemisException as e:
             print("Remis! Nobody wins.")
             self.remis_ui(e.reason)
+        finally:
+            self.update_field()
 
             
         self.Sp1_phase.setText("Phase{}".format(self.game.get_player_1().phase))

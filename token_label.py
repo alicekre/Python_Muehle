@@ -25,6 +25,8 @@ class token_label(QLabel):
             self.drag_start_position = event.pos()
 
     def mouseMoveEvent(self, event):
+        if self.dialog.removable==True:
+            return
         if not (event.buttons() & Qt.LeftButton):
             return
         if (event.pos() - self.drag_start_position).manhattanLength() < QApplication.startDragDistance():
@@ -32,6 +34,8 @@ class token_label(QLabel):
         drag = QDrag(self)
         mimedata = QMimeData()
         mimedata.setText(self.text())
+        if self.pixmap()==None:
+            return
         mimedata.setImageData(self.pixmap().toImage())
 
         drag.setMimeData(mimedata)
