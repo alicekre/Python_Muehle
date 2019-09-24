@@ -110,6 +110,8 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
 #                getattr(self, "label_{}".format(self.start_label)).setPixmap(QtGui.QPixmap("gelb.png"))
 #            getattr(self, "label_{}".format(self.end_label)).clear()
 #            self.label_121.clear()
+            
+            
 #                                    
         except WinException as e:
             print("Player {} wins, player {} looses".format(e.number_winner, e.number_looser))
@@ -122,20 +124,39 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             self.remis_ui(e.reason)
             
 
-        except KeyboardInterrupt:
-            print("Quit? (y/n):", end="")
-            if input() == "y":
-                quit()
-                
-        self.Sp1_phase.setText("Phase{}".format(self.game.get_phase_player_1()))
-        self.Sp2_phase.setText("Phase{}".format(self.game.get_phase_player_1()))  
-        print(self.game.get_phase_player_1())
-        if self.game.get_turn()==1:
-            self.player1.setStyleSheet('QGroupBox {color: red; }')
-            self.player2.setStyleSheet('QGroupBox {color: black; }')
-        if self.game.get_turn()==2:
-            self.player1.setStyleSheet('QGroupBox {color: black; }')
-            self.player2.setStyleSheet('QGroupBox {color: red; }')
+#        except KeyboardInterrupt:
+#            print("Quit? (y/n):", end="")
+#            if input() == "y":
+#                quit()
+        finally:       
+            self.Sp1_phase.setText("Phase{}".format(self.game.get_phase_player_1()))
+            self.Sp2_phase.setText("Phase{}".format(self.game.get_phase_player_1()))  
+            print(self.game.get_phase_player_1())
+            if self.game.get_turn()==1:
+                self.player1.setStyleSheet('QGroupBox {color: red; }')
+                self.player2.setStyleSheet('QGroupBox {color: black; }')
+            if self.game.get_turn()==2:
+                self.player1.setStyleSheet('QGroupBox {color: black; }')
+                self.player2.setStyleSheet('QGroupBox {color: red; }')
+            current_field = self.game.get_field()
+            for label in self.field_names:
+                label_tuple =(int(label[0]),int(label[1]),
+                    int(label[2]))
+                if current_field[label_tuple]==0:
+                    getattr(self,"label_{}".format(label)).clear()
+                elif current_field[label_tuple]==1:
+                    getattr(self,"label_{}".format(label)).setPixmap(QtGui.QPixmap("blau.png"))
+                elif current_field[label_tuple]==2:
+                    getattr(self,"label_{}".format(label)).setPixmap(QtGui.QPixmap("gelb.png"))
+                    print(label)
+#            chips_left_player_1 = self.game.get_player_1().get_number_chips()
+#            for i  in range(10-chips_left_player_1 , 10):
+#                getattr(self, "blau_{}".format(i)).setPixmap(QtGui.QPixmap("blau.png"))
+#            chips_left_player_2 = self.game.get_player_2().get_number_chips()
+#            for i  in range(10-chips_left_player_2 , 10):
+#                getattr(self, "blau_{}".format(i)).setPixmap(QtGui.QPixmap("blau.png"))
+#                
+            
             
 
             
@@ -151,6 +172,8 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
                                 "Wähle einen anderen."
                               , "Falscher Stein entfernt")
             
+        self.Sp1_phase.setText("Phase{}".format(self.game.get_phase_player_1()))
+        self.Sp2_phase.setText("Phase{}".format(self.game.get_phase_player_1()))      
         if self.game.get_turn()==1:
             self.player1.setStyleSheet('QGroupBox {color: red; }')
             self.player2.setStyleSheet('QGroupBox {color: black; }')
@@ -174,13 +197,14 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         self.player2.setStyleSheet('QGroupBox {color: black; }')
         self.Sp1_phase.setText("Phase1")
         self.Sp2_phase.setText("Phase1")
+        self.game=Game()
         print("Ausgangszustand")
     
-    def phase_2_ui(self,player):
-        self.window.initUI("Remis: "
-                           , "Remis")
-    def phase_3_ui(self,player):
-        pass
+#    def phase_2_ui(self,player):
+#        self.window.initUI("Remis: "
+#                           , "Remis")
+#    def phase_3_ui(self,player):
+#        pass
     def won_ui(self, winner, looser, reason):
         if reason == 1:
             reason_text="Spieler {} hat keine Spielsteine mehr.".format(looser)
