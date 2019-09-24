@@ -28,6 +28,7 @@ class playing_field_label(QLabel):
     def dropEvent(self, event):
         if event.mimeData().hasImage():
             print("dropEvent")
+#            self.dialog.start_label.clear()
             #self.drop_position=self.pos()
 #            print(self)
             for name in self.dialog.field_names:
@@ -35,10 +36,10 @@ class playing_field_label(QLabel):
                     self.dialog.end_label=name
                     #ToDo: nie True
 
-                
+              
             self.setPixmap(QPixmap.fromImage(QImage(event.mimeData().imageData())))
-
-            self.dialog.turn()
+            self.dialog.turn() 
+            
    
 
     def mousePressEvent(self, event):
@@ -72,6 +73,6 @@ class playing_field_label(QLabel):
         painter.end()
         drag.setPixmap(pixmap)
         drag.setHotSpot(event.pos())
-        self.clear()
+        
         print("Moving")
         drag.exec_(Qt.MoveAction)

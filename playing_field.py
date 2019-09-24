@@ -170,11 +170,15 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
                 getattr(self, "label_{}".format(label)).setPixmap(QtGui.QPixmap("gelb.png"))
                 print(label)
         chips_left_player_1 = self.game.get_player_1().get_number_chips()
-        for i in range(1, chips_left_player_1):
+        for i in range(1, chips_left_player_1 + 1):
             getattr(self, "blau_{}".format(i)).setPixmap(QtGui.QPixmap("blau.png"))
+        for i in range(chips_left_player_1 + 1,10):
+            getattr(self, "blau_{}".format(i)).clear()
         chips_left_player_2 = self.game.get_player_2().get_number_chips()
         for i in range(1, chips_left_player_2 + 1):
             getattr(self, "gelb_{}".format(i)).setPixmap(QtGui.QPixmap("gelb.png"))
+        for i in range(chips_left_player_2 + 1,10):
+            getattr(self, "gelb_{}".format(i)).clear()
             
     def remove(self):     
         try:

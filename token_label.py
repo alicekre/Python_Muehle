@@ -42,7 +42,6 @@ class token_label(QLabel):
         painter.end()
         drag.setPixmap(pixmap)
         drag.setHotSpot(event.pos())
-        self.clear()
         print("Moving")
         drag.exec_(Qt.MoveAction)
        
