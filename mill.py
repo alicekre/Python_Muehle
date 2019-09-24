@@ -543,7 +543,7 @@ class Game:
         :type player_1: Player
         :param player_2: the second player
         :type player_2: Player
-        :param field: the playboard
+        :param field: the play board
         :type field: Field
         :param turn: the player in turn
         :type turn: Player
