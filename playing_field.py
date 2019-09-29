@@ -143,7 +143,7 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
     def update_field(self):
         
         self.Sp1_phase.setText("Phase{}".format(self.game.get_player_1().phase))
-        self.Sp2_phase.setText("Phase{}".format(self.game.get_player_1().phase))
+        self.Sp2_phase.setText("Phase{}".format(self.game.get_player_2().phase))
         print(self.game.get_player_1().phase)
         print(self.game.get_player_2().phase)
         
@@ -214,7 +214,7 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         
         
             
-    def resetMill(self, image):
+    def resetMill(self):
         #Ui_MainWindow, WindowBaseClass = uic.loadUiType("Spielfeld_OF_4.ui")
         for label in self.field_label:
             label.clear()
@@ -277,6 +277,7 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
             reason_text="Spieler {} kann sich nicht mehr bewegen.".format(looser)
         self.window4.initUI("Spieler {} hat gewonnen. ".format(winner)+ reason_text
                            , "Won")
+        self.resetMill()
     def remis_ui(self,reason):
         if reason==1:
             self.window3.initUI("Remis: Es gab in 50 aufeinanderfolgenden Züge keine Mühle "
