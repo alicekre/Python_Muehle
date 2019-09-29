@@ -1,5 +1,5 @@
 #
-# @author Christian Birker
+# @author: Christian Birker
 #
 # storage module for the board game mill
 # saves and loads games

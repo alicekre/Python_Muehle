@@ -1,5 +1,5 @@
 #
-# @author Christian Birker
+# @author: Christian Birker
 #
 # console playable mill board game
 #

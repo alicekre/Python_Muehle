@@ -1,11 +1,11 @@
 #
-# @author Christian Birker
+# @author: Christian Birker
 #
 # Logic of board game mill
 #
 
 import logging
-#from prettytable import PrettyTable  # just used for printing the play board formatted.
+# from prettytable import PrettyTable  # just used for printing the play board formatted.
 from ast import literal_eval as make_tuple
 
 # create logger for module
@@ -956,7 +956,8 @@ class Game:
         """
         one move in the game
 
-        :param start_pos: current position of the chip, None if you want to put a chip in phase 1
+        :param start_pos: current position of the chip, (0,0,1) / (0,0,2)  if you want to put a chip in phase 1 of
+                            player_1/player_2
         :type start_pos: tuple
         :param end_pos: new position of the chip
         :type end_pos: tuple

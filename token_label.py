@@ -10,7 +10,6 @@ class token_label(QLabel):
         
     def saveDialog(self, dialog):
         self.dialog = dialog
-        
 
     def mousePressEvent(self, event):
         print("Pressed")
@@ -25,17 +24,22 @@ class token_label(QLabel):
             self.drag_start_position = event.pos()
 
     def mouseMoveEvent(self, event):
-        if self.dialog.removable==True:
+        if self.dialog.removable:
             return
+
         if not (event.buttons() & Qt.LeftButton):
             return
+
         if (event.pos() - self.drag_start_position).manhattanLength() < QApplication.startDragDistance():
             return
+
         drag = QDrag(self)
         mimedata = QMimeData()
         mimedata.setText(self.text())
-        if self.pixmap()==None:
+
+        if self.pixmap() is None:
             return
+
         mimedata.setImageData(self.pixmap().toImage())
 
         drag.setMimeData(mimedata)
