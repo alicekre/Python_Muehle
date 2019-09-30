@@ -223,7 +223,6 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
 
         for label in self.field_label:
             label.clear()
-            label.setText("o")
 
         for label in self.blue_token:
             label.setPixmap(QPixmap("blau.png"))
@@ -291,10 +290,6 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
 
         if reason == 2:
             self.window3.initUI("Remis: Es wurde drei mal die selbe Stellung erreicht", "Remis")
-
-    def message(self, message_):
-        print(message_)
-
 
 def initUI():
     # In Spyder kann nur eine Qt-Applikation laufen und sie werden nicht anschliessend geloescht
