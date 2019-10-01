@@ -51,6 +51,8 @@ class playing_field_label(QLabel):
 
         if (event.pos() - self.drag_start_position).manhattanLength() < QApplication.startDragDistance():
             return
+        if self.dialog.removable:
+            return
 
         drag = QDrag(self)
         mimedata = QMimeData()

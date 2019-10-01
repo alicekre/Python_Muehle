@@ -197,16 +197,16 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
         finally:
             self.update_field()
 
-        self.Sp1_phase.setText("Phase{}".format(self.game.get_player_1().phase))
-        self.Sp2_phase.setText("Phase{}".format(self.game.get_player_1().phase))
-
-        if self.game.get_turn() == 1:
-            self.player1.setStyleSheet('QGroupBox {color: red; }')
-            self.player2.setStyleSheet('QGroupBox {color: black; }')
-
-        if self.game.get_turn() == 2:
-            self.player1.setStyleSheet('QGroupBox {color: black; }')
-            self.player2.setStyleSheet('QGroupBox {color: red; }')
+#        self.Sp1_phase.setText("Phase{}".format(self.game.get_player_1().phase))
+#        self.Sp2_phase.setText("Phase{}".format(self.game.get_player_1().phase))
+#
+#        if self.game.get_turn() == 1:
+#            self.player1.setStyleSheet('QGroupBox {color: red; }')
+#            self.player2.setStyleSheet('QGroupBox {color: black; }')
+#
+#        if self.game.get_turn() == 2:
+#            self.player1.setStyleSheet('QGroupBox {color: black; }')
+#            self.player2.setStyleSheet('QGroupBox {color: red; }')
 
     def resetMill(self):
         self.blue_token = [self.blau_1, self.blau_2, self.blau_3, self.blau_4, self.blau_5, self.blau_6, self.blau_7,
@@ -276,7 +276,7 @@ class MyDialog(WindowBaseClass, Ui_MainWindow):
 
     def won_ui(self, winner, looser, reason):
         if reason == 1:
-            reason_text = "Spieler {} hat keine Spielsteine mehr.".format(looser)
+            reason_text = "Spieler {} hat nur zwei Spielsteine übrig.".format(looser)
 
         if reason == 2:
             reason_text = "Spieler {} kann sich nicht mehr bewegen.".format(looser)
